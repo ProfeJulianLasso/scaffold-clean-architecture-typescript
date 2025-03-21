@@ -4,7 +4,7 @@
  * una interfaz consistente y declarativa para el manejo de errores en la aplicación.
  */
 
-import { ErrorType, ResultException } from "../exceptions/result.exception";
+import { ErrorType, ResultException } from '../exceptions/result.exception';
 
 /**
  * Clase genérica que representa el resultado de una operación.
@@ -23,7 +23,7 @@ export class Result<SuccessValue> {
   private constructor(
     isSuccess: boolean,
     value?: SuccessValue,
-    error?: ResultException
+    error?: ResultException,
   ) {
     this._isSuccess = isSuccess;
     this._value = value;
@@ -50,7 +50,7 @@ export class Result<SuccessValue> {
    */
   public getValue(): SuccessValue {
     if (!this._isSuccess) {
-      throw new Error("No se puede obtener el valor de un resultado fallido");
+      throw new Error('No se puede obtener el valor de un resultado fallido');
     }
     return this._value as SuccessValue;
   }
@@ -61,7 +61,7 @@ export class Result<SuccessValue> {
    */
   public getError(): ResultException {
     if (this._isSuccess) {
-      throw new Error("No se puede obtener el error de un resultado exitoso");
+      throw new Error('No se puede obtener el error de un resultado exitoso');
     }
     return this._error as ResultException;
   }
@@ -73,7 +73,7 @@ export class Result<SuccessValue> {
    * @returns Una nueva instancia de Result representando un éxito
    */
   public static success<SuccessValue>(
-    value?: SuccessValue
+    value?: SuccessValue,
   ): Result<SuccessValue> {
     return new Result<SuccessValue>(true, value);
   }
@@ -85,7 +85,7 @@ export class Result<SuccessValue> {
    * @returns Una nueva instancia de Result representando un fallo
    */
   public static failure<SuccessValue>(
-    error: ResultException
+    error: ResultException,
   ): Result<SuccessValue> {
     return new Result<SuccessValue>(false, undefined, error);
   }
@@ -108,10 +108,10 @@ export class Result<SuccessValue> {
       metadata?: Record<string, unknown>;
       isOperational?: boolean;
       stack?: string;
-    }
+    },
   ): Result<SuccessValue> {
     return Result.failure<SuccessValue>(
-      new ResultException(type, message, options)
+      new ResultException(type, message, options),
     );
   }
 
@@ -122,7 +122,7 @@ export class Result<SuccessValue> {
    * @returns Un resultado exitoso o un resultado fallido con la excepción capturada
    */
   public static try<SuccessValue>(
-    fn: () => SuccessValue
+    fn: () => SuccessValue,
   ): Result<SuccessValue> {
     try {
       return Result.success(fn());
@@ -133,9 +133,9 @@ export class Result<SuccessValue> {
         return Result.failure<SuccessValue>(ResultException.fromError(error));
       } else {
         return Result.failure<SuccessValue>(
-          new ResultException(ErrorType.INTERNAL, "Error desconocido", {
+          new ResultException(ErrorType.INTERNAL, 'Error desconocido', {
             metadata: { originalError: error },
-          })
+          }),
         );
       }
     }
@@ -149,7 +149,7 @@ export class Result<SuccessValue> {
    * @returns Un nuevo resultado con el valor transformado o el mismo error
    */
   public map<MappedValue>(
-    fn: (value: SuccessValue) => MappedValue
+    fn: (value: SuccessValue) => MappedValue,
   ): Result<MappedValue> {
     if (this.isFailure()) {
       return Result.failure<MappedValue>(this.getError());
@@ -163,8 +163,8 @@ export class Result<SuccessValue> {
       }
       return Result.failure<MappedValue>(
         ResultException.fromError(
-          error instanceof Error ? error : new Error(String(error))
-        )
+          error instanceof Error ? error : new Error(String(error)),
+        ),
       );
     }
   }
@@ -176,7 +176,7 @@ export class Result<SuccessValue> {
    * @returns El nuevo Result o el Result fallido original
    */
   public flatMap<ChainedValue>(
-    fn: (value: SuccessValue) => Result<ChainedValue>
+    fn: (value: SuccessValue) => Result<ChainedValue>,
   ): Result<ChainedValue> {
     if (this.isFailure()) {
       return Result.failure<ChainedValue>(this.getError());
@@ -190,8 +190,8 @@ export class Result<SuccessValue> {
       }
       return Result.failure<ChainedValue>(
         ResultException.fromError(
-          error instanceof Error ? error : new Error(String(error))
-        )
+          error instanceof Error ? error : new Error(String(error)),
+        ),
       );
     }
   }
@@ -205,7 +205,7 @@ export class Result<SuccessValue> {
    */
   public fold<FoldedValue>(
     onSuccess: (value: SuccessValue) => FoldedValue,
-    onFailure: (error: ResultException) => FoldedValue
+    onFailure: (error: ResultException) => FoldedValue,
   ): FoldedValue {
     return this.isSuccess()
       ? onSuccess(this.getValue())
@@ -219,7 +219,7 @@ export class Result<SuccessValue> {
    * @returns El resultado original si es exitoso, o el resultado de la recuperación
    */
   public recover(
-    fn: (error: ResultException) => Result<SuccessValue>
+    fn: (error: ResultException) => Result<SuccessValue>,
   ): Result<SuccessValue> {
     if (this.isSuccess()) {
       return this;
@@ -233,8 +233,8 @@ export class Result<SuccessValue> {
       }
       return Result.failure<SuccessValue>(
         ResultException.fromError(
-          error instanceof Error ? error : new Error(String(error))
-        )
+          error instanceof Error ? error : new Error(String(error)),
+        ),
       );
     }
   }
@@ -251,7 +251,7 @@ export class Result<SuccessValue> {
         action(this.getValue());
       } catch (error) {
         // Solo registramos el error, manteniendo el flujo del resultado original
-        console.error("Error en el manejador onSuccess:", error);
+        console.error('Error en el manejador onSuccess:', error);
       }
     }
     return this;
@@ -269,7 +269,7 @@ export class Result<SuccessValue> {
         action(this.getError());
       } catch (error) {
         // Solo registramos el error, manteniendo el flujo del resultado original
-        console.error("Error en el manejador onFailure:", error);
+        console.error('Error en el manejador onFailure:', error);
       }
     }
     return this;
@@ -305,7 +305,7 @@ export class Result<SuccessValue> {
    * @returns Un resultado exitoso con array de valores o el primer resultado fallido
    */
   public static combine<ItemValue>(
-    results: Result<ItemValue>[]
+    results: Result<ItemValue>[],
   ): Result<ItemValue[]> {
     const values: ItemValue[] = [];
 

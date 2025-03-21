@@ -11,23 +11,23 @@
  */
 export enum ErrorType {
   /** Errores de validación de datos de entrada */
-  VALIDATION = "VALIDATION",
+  VALIDATION = 'VALIDATION',
   /** Errores cuando un recurso no es encontrado */
-  NOT_FOUND = "NOT_FOUND",
+  NOT_FOUND = 'NOT_FOUND',
   /** Errores de conflicto, como duplicación de recursos */
-  CONFLICT = "CONFLICT",
+  CONFLICT = 'CONFLICT',
   /** Errores de autenticación */
-  UNAUTHORIZED = "UNAUTHORIZED",
+  UNAUTHORIZED = 'UNAUTHORIZED',
   /** Errores de autorización */
-  FORBIDDEN = "FORBIDDEN",
+  FORBIDDEN = 'FORBIDDEN',
   /** Errores internos del servidor */
-  INTERNAL = "INTERNAL",
+  INTERNAL = 'INTERNAL',
   /** Errores relacionados con la lógica de dominio */
-  DOMAIN = "DOMAIN",
+  DOMAIN = 'DOMAIN',
   /** Errores relacionados con la capa de aplicación */
-  APPLICATION = "APPLICATION",
+  APPLICATION = 'APPLICATION',
   /** Errores relacionados con la capa de infraestructura */
-  INFRASTRUCTURE = "INFRASTRUCTURE",
+  INFRASTRUCTURE = 'INFRASTRUCTURE',
 }
 
 /**
@@ -87,7 +87,7 @@ export class ResultException extends Error {
       metadata?: Record<string, unknown>;
       isOperational?: boolean;
       stack?: string;
-    }
+    },
   ) {
     super(message);
     Object.setPrototypeOf(this, ResultException.prototype);
@@ -97,7 +97,7 @@ export class ResultException extends Error {
     this.details = {
       code: options?.code ?? type,
       message: message,
-      source: options?.source ?? "unknown",
+      source: options?.source ?? 'unknown',
       timestamp: new Date(),
       metadata: options?.metadata || {},
       stack: options?.stack ?? this.stack,
@@ -139,7 +139,7 @@ export class ResultException extends Error {
   public toJSON(): IErrorDetails {
     return {
       ...this.details,
-      stack: process.env.NODE_ENV === "production" ? undefined : this.stack,
+      stack: process.env.NODE_ENV === 'production' ? undefined : this.stack,
     };
   }
 
@@ -154,7 +154,7 @@ export class ResultException extends Error {
    */
   public static fromError(
     error: Error,
-    type: ErrorType = ErrorType.INTERNAL
+    type: ErrorType = ErrorType.INTERNAL,
   ): ResultException {
     if (error instanceof ResultException) {
       return error;
