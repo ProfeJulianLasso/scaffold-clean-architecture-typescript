@@ -8,6 +8,8 @@
  * - Componente aleatorio
  */
 
+import { ErrorType, ResultException } from '@common/exceptions';
+
 export class UUIDv7 {
   private static readonly _REGEX_VALIDATE: RegExp =
     /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -42,7 +44,15 @@ export class UUIDv7 {
    */
   public static fromTimestamp(timestamp: number): UUIDv7 {
     if (!Number.isInteger(timestamp) || timestamp < 0) {
-      throw new Error('El timestamp debe ser un entero no negativo');
+      throw new ResultException(
+        ErrorType.VALIDATION,
+        'El timestamp debe ser un entero no negativo',
+        {
+          code: 'INVALID_TIMESTAMP',
+          statusCode: 400,
+          metadata: { timestamp },
+        },
+      );
     }
 
     return UUIDv7._fromTimestamp(timestamp);
@@ -84,8 +94,14 @@ export class UUIDv7 {
    */
   public static parse(uuidString: string): UUIDv7 {
     if (!UUIDv7.isValid(uuidString)) {
-      throw new Error(
-        `El formato del UUID no es válido o no es un UUIDv7: ${uuidString}`,
+      throw new ResultException(
+        ErrorType.VALIDATION,
+        'El formato del UUID no es válido o no es un UUIDv7',
+        {
+          code: 'INVALID_UUID_FORMAT',
+          statusCode: 400,
+          metadata: { uuidString },
+        },
       );
     }
 
