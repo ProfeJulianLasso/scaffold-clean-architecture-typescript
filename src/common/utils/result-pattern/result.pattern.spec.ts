@@ -299,6 +299,29 @@ describe('Result', () => {
         expect(mappedResult.isFailure()).toBe(true);
         expect(mappedResult.getError()).toBe(expectedError);
       });
+
+      it('debería manejar valores no-Error lanzados en map', () => {
+        // Arrange (Preparar)
+        const result = Result.success(5);
+        const nonErrorValue = 'este no es un error sino un string';
+        const nonErrorValueExpected = 'este no es un error sino un string';
+        const transform = (): number => {
+          // eslint-disable-next-line @typescript-eslint/only-throw-error
+          throw nonErrorValue; // Lanzamos un valor que no es Error
+        };
+        const errorTypeExpected = ErrorType.INTERNAL;
+
+        // Act (Actuar)
+        const mappedResult = result.map(transform);
+
+        // Assert (Verificar)
+        expect(mappedResult.isFailure()).toBe(true);
+        expect(mappedResult.getError()).toBeInstanceOf(ResultException);
+        expect(mappedResult.getError().type).toBe(errorTypeExpected);
+        expect(mappedResult.getError().message).toBe(
+          String(nonErrorValueExpected),
+        );
+      });
     });
 
     describe('flatMap', () => {
@@ -365,6 +388,56 @@ describe('Result', () => {
         // Assert (Verificar)
         expect(chainedResult.isFailure()).toBe(true);
         expect(chainedResult.getError().message).toBe(expectedMessage);
+      });
+
+      it('debería manejar excepciones de tipo ResultException en flatMap', () => {
+        // Arrange (Preparar)
+        const result = Result.success(10);
+        const resultError = new ResultException(
+          ErrorType.DOMAIN,
+          'Error específico de ResultException',
+        );
+        const chain = (): never => {
+          throw resultError; // Lanzamos directamente una ResultException
+        };
+        const expectedError = resultError;
+
+        // Act (Actuar)
+        const mappedResult = result.flatMap(chain);
+
+        // Assert (Verificar)
+        expect(mappedResult.isFailure()).toBe(true);
+        expect(mappedResult.getError()).toBe(expectedError);
+      });
+
+      it('debería manejar valores no-Error lanzados en flatMap', () => {
+        // Arrange (Preparar)
+        const result = Result.success(10);
+        const nonErrorValue = {
+          customError: true,
+          message: 'objeto personalizado',
+        };
+        const nonErrorValueExpected = {
+          customError: true,
+          message: 'objeto personalizado',
+        };
+        const chain = (): Result<number> => {
+          // eslint-disable-next-line @typescript-eslint/only-throw-error
+          throw nonErrorValue; // Lanzamos un objeto que no es Error
+        };
+        const errorTypeExpected = ErrorType.INTERNAL;
+
+        // Act (Actuar)
+        const chainedResult = result.flatMap(chain);
+
+        // Assert (Verificar)
+        expect(chainedResult.isFailure()).toBe(true);
+        expect(chainedResult.getError()).toBeInstanceOf(ResultException);
+        expect(chainedResult.getError().type).toBe(errorTypeExpected);
+        expect(chainedResult.getError().message).toBe(
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string
+          String(nonErrorValueExpected),
+        );
       });
     });
   });
@@ -482,6 +555,60 @@ describe('Result', () => {
         // Assert (Verificar)
         expect(recoveredResult.isFailure()).toBe(true);
         expect(recoveredResult.getError().message).toBe(expectedMessage);
+      });
+
+      it('debería manejar excepciones de tipo ResultException en recover', () => {
+        // Arrange (Preparar)
+        const initialError = new ResultException(
+          ErrorType.NOT_FOUND,
+          'Error inicial',
+        );
+        const result = Result.failure<string>(initialError);
+        const recoveryError = new ResultException(
+          ErrorType.FORBIDDEN,
+          'Error de recuperación específico',
+        );
+        const recovery = (): never => {
+          throw recoveryError; // Lanzamos directamente una ResultException
+        };
+        const expectedError = new ResultException(
+          ErrorType.FORBIDDEN,
+          'Error de recuperación específico',
+        );
+
+        // Act (Actuar)
+        const recoveredResult = result.recover(recovery);
+
+        // Assert (Verificar)
+        expect(recoveredResult.isFailure()).toBe(true);
+        expect(recoveredResult.getError()).toStrictEqual(expectedError);
+      });
+
+      it('debería manejar valores no-Error lanzados en recover', () => {
+        // Arrange (Preparar)
+        const initialError = new ResultException(
+          ErrorType.NOT_FOUND,
+          'Error inicial',
+        );
+        const result = Result.failure<string>(initialError);
+        const nonErrorValue = 42; // Un número
+        const recovery = (): Result<string> => {
+          // eslint-disable-next-line @typescript-eslint/only-throw-error
+          throw nonErrorValue; // Lanzamos un número
+        };
+        const errorTypeExpected = ErrorType.INTERNAL;
+        const nonErrorValueExpected = 42;
+
+        // Act (Actuar)
+        const recoveredResult = result.recover(recovery);
+
+        // Assert (Verificar)
+        expect(recoveredResult.isFailure()).toBe(true);
+        expect(recoveredResult.getError()).toBeInstanceOf(ResultException);
+        expect(recoveredResult.getError().type).toBe(errorTypeExpected);
+        expect(recoveredResult.getError().message).toBe(
+          String(nonErrorValueExpected),
+        );
       });
     });
 
