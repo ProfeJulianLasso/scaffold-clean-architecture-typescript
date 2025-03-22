@@ -1,8 +1,4 @@
-import {
-  ErrorType,
-  IErrorDetails,
-  ResultException,
-} from '@common/exceptions/result.exception';
+import { ErrorType, IErrorDetails, ResultException } from './result.exception';
 
 /**
  * Pruebas unitarias para la clase ResultException
@@ -16,16 +12,15 @@ describe('ResultException', () => {
       // Arrange (Preparar)
       const errorType = ErrorType.VALIDATION;
       const errorMessage = 'Entrada inválida';
-
-      // Act (Actuar)
-      const exception = new ResultException(errorType, errorMessage);
-
-      // Assert (Verificar)
       const expectedType = ErrorType.VALIDATION;
       const expectedMessage = 'Entrada inválida';
       const expectedStatusCode = 400;
       const expectedIsOperational = true;
 
+      // Act (Actuar)
+      const exception = new ResultException(errorType, errorMessage);
+
+      // Assert (Verificar)
       expect(exception).toBeInstanceOf(Error);
       expect(exception).toBeInstanceOf(ResultException);
       expect(exception.type).toBe(expectedType);
@@ -49,11 +44,6 @@ describe('ResultException', () => {
         isOperational: false,
         stack: 'traza de pila personalizada',
       };
-
-      // Act (Actuar)
-      const exception = new ResultException(errorType, errorMessage, options);
-
-      // Assert (Verificar)
       const expectedType = ErrorType.NOT_FOUND;
       const expectedMessage = 'Recurso no encontrado';
       const expectedCode = 'CUSTOM_CODE';
@@ -63,6 +53,10 @@ describe('ResultException', () => {
       const expectedIsOperational = false;
       const expectedStack = 'traza de pila personalizada';
 
+      // Act (Actuar)
+      const exception = new ResultException(errorType, errorMessage, options);
+
+      // Assert (Verificar)
       expect(exception.type).toBe(expectedType);
       expect(exception.message).toBe(expectedMessage);
       expect(exception.statusCode).toBe(expectedStatusCode);
@@ -74,14 +68,15 @@ describe('ResultException', () => {
     });
 
     it('debería configurar correctamente el nombre y la herencia', () => {
-      // Arrange & Act (Preparar y Actuar)
-      const exception = new ResultException(
-        ErrorType.VALIDATION,
-        'Error de prueba',
-      );
+      // Arrange (Preparar)
+      const errorType = ErrorType.VALIDATION;
+      const errorMessage = 'Error de prueba';
+      const expectedName = 'ResultException';
+
+      // Act (Actuar)
+      const exception = new ResultException(errorType, errorMessage);
 
       // Assert (Verificar)
-      const expectedName = 'ResultException';
       expect(exception.name).toBe(expectedName);
       expect(Object.getPrototypeOf(exception)).toBe(ResultException.prototype);
       expect(exception instanceof Error).toBe(true);
@@ -105,10 +100,14 @@ describe('ResultException', () => {
         [ErrorType.INFRASTRUCTURE]: 500,
       };
 
-      // Act & Assert (Actuar y Verificar)
       errorTypes.forEach(type => {
-        const testError = new ResultException(type, 'Mensaje de prueba');
+        // Arrange (Preparar)
         const expectedCode = statusCodeMap[type];
+
+        // Act (Actuar)
+        const testError = new ResultException(type, 'Mensaje de prueba');
+
+        // Assert (Verificar)
         expect(testError.statusCode).toBe(expectedCode);
       });
     });
@@ -148,11 +147,6 @@ describe('ResultException', () => {
         ErrorType.INTERNAL,
         'Error de prueba',
       );
-
-      // Act (Actuar)
-      const jsonResult: IErrorDetails = exception.toJSON();
-
-      // Assert (Verificar)
       const expectedProperties = [
         'code',
         'message',
@@ -161,6 +155,11 @@ describe('ResultException', () => {
         'metadata',
         'stack',
       ];
+
+      // Act (Actuar)
+      const jsonResult: IErrorDetails = exception.toJSON();
+
+      // Assert (Verificar)
       expectedProperties.forEach(prop => {
         expect(jsonResult).toHaveProperty(prop);
       });
@@ -174,12 +173,12 @@ describe('ResultException', () => {
         ErrorType.INTERNAL,
         'Error de prueba',
       );
+      const expectedStack = undefined;
 
       // Act (Actuar)
       const jsonResult: IErrorDetails = exception.toJSON();
 
       // Assert (Verificar)
-      const expectedStack = undefined;
       expect(jsonResult.stack).toBe(expectedStack);
     });
 
@@ -196,16 +195,15 @@ describe('ResultException', () => {
           metadata,
         },
       );
-
-      // Act (Actuar)
-      const jsonResult: IErrorDetails = exception.toJSON();
-
-      // Assert (Verificar)
       const expectedCode = 'ACCESS_DENIED';
       const expectedMessage = 'Acceso denegado';
       const expectedSource = 'auth-service';
       const expectedMetadata = metadata;
 
+      // Act (Actuar)
+      const jsonResult: IErrorDetails = exception.toJSON();
+
+      // Assert (Verificar)
       expect(jsonResult.code).toBe(expectedCode);
       expect(jsonResult.message).toBe(expectedMessage);
       expect(jsonResult.source).toBe(expectedSource);
@@ -219,15 +217,14 @@ describe('ResultException', () => {
     it('debería convertir un Error estándar en ResultException con tipo por defecto', () => {
       // Arrange (Preparar)
       const originalError = new Error('Error estándar');
+      const expectedType = ErrorType.INTERNAL;
+      const expectedMessage = 'Error estándar';
+      const expectedStatusCode = 500;
 
       // Act (Actuar)
       const exception = ResultException.fromError(originalError);
 
       // Assert (Verificar)
-      const expectedType = ErrorType.INTERNAL;
-      const expectedMessage = 'Error estándar';
-      const expectedStatusCode = 500;
-
       expect(exception).toBeInstanceOf(ResultException);
       expect(exception.type).toBe(expectedType);
       expect(exception.message).toBe(expectedMessage);
@@ -240,20 +237,20 @@ describe('ResultException', () => {
       // Arrange (Preparar)
       const originalError = new Error('Error de dominio');
       const customType = ErrorType.DOMAIN;
+      const expectedType = ErrorType.DOMAIN;
+      const expectedStatusCode = 422;
 
       // Act (Actuar)
       const exception = ResultException.fromError(originalError, customType);
 
       // Assert (Verificar)
-      const expectedType = ErrorType.DOMAIN;
-      const expectedStatusCode = 422;
-
       expect(exception.type).toBe(expectedType);
       expect(exception.statusCode).toBe(expectedStatusCode);
     });
 
     it('debería devolver una ResultException existente sin modificarla', () => {
       // Arrange (Preparar)
+      const errorType = ErrorType.INTERNAL;
       const originalException = new ResultException(
         ErrorType.VALIDATION,
         'Excepción original',
@@ -262,18 +259,17 @@ describe('ResultException', () => {
           metadata: { key: 'value' },
         },
       );
-
-      // Act (Actuar)
-      const resultException = ResultException.fromError(
-        originalException,
-        ErrorType.INTERNAL,
-      );
-
-      // Assert (Verificar)
       const expectedType = ErrorType.VALIDATION; // Debería mantener el tipo original
       const expectedMessage = 'Excepción original';
       const expectedMetadata = { key: 'value' };
 
+      // Act (Actuar)
+      const resultException = ResultException.fromError(
+        originalException,
+        errorType,
+      );
+
+      // Assert (Verificar)
       expect(resultException).toBe(originalException); // Debería ser el mismo objeto (referencia)
       expect(resultException.type).toBe(expectedType);
       expect(resultException.message).toBe(expectedMessage);
@@ -284,12 +280,12 @@ describe('ResultException', () => {
       // Arrange (Preparar)
       const originalError = new Error('Error con stack');
       const originalStack = originalError.stack;
+      const expectedStack = originalStack;
 
       // Act (Actuar)
       const exception = ResultException.fromError(originalError);
 
       // Assert (Verificar)
-      const expectedStack = originalStack;
       expect(exception.details.stack).toBe(expectedStack);
     });
   });
@@ -297,48 +293,51 @@ describe('ResultException', () => {
   // Casos de borde y esquina
   describe('Casos de borde y esquina', () => {
     it('debería manejar mensajes vacíos', () => {
-      // Arrange & Act (Preparar y Actuar)
-      const exception = new ResultException(ErrorType.VALIDATION, '');
+      // Arrange (Preparar)
+      const errorType = ErrorType.VALIDATION;
+      const errorMessage = '';
+      const expectedMessage = '';
+
+      // Act (Actuar)
+      const exception = new ResultException(errorType, errorMessage);
 
       // Assert (Verificar)
-      const expectedMessage = '';
       expect(exception.message).toBe(expectedMessage);
       expect(exception.details.message).toBe(expectedMessage);
     });
 
     it('debería manejar valores null o undefined en metadata', () => {
       // Arrange (Preparar)
+      const errorType = ErrorType.DOMAIN;
+      const errorMessage = 'Error de prueba';
       const metadata = {
         nullValue: null,
         undefinedValue: undefined,
         validValue: 'test',
       };
-
-      // Act (Actuar)
-      const exception = new ResultException(
-        ErrorType.DOMAIN,
-        'Mensaje de prueba',
-        { metadata },
-      );
-
-      // Assert (Verificar)
       const expectedMetadata = {
         nullValue: null,
         undefinedValue: undefined,
         validValue: 'test',
       };
+
+      // Act (Actuar)
+      const exception = new ResultException(errorType, errorMessage, {
+        metadata,
+      });
+
+      // Assert (Verificar)
       expect(exception.details.metadata).toEqual(expectedMetadata);
     });
 
     it('debería establecer una marca de tiempo cercana a la hora actual', () => {
       // Arrange (Preparar)
+      const errorType = ErrorType.VALIDATION;
+      const errorMessage = 'Error de prueba';
       const before = new Date();
 
       // Act (Actuar)
-      const exception = new ResultException(
-        ErrorType.VALIDATION,
-        'Error de prueba',
-      );
+      const exception = new ResultException(errorType, errorMessage);
       const after = new Date();
 
       // Assert (Verificar)
@@ -349,14 +348,15 @@ describe('ResultException', () => {
     });
 
     it('debería usar "unknown" como source por defecto cuando no se especifica', () => {
-      // Arrange & Act (Preparar y Actuar)
-      const exception = new ResultException(
-        ErrorType.APPLICATION,
-        'Error de aplicación',
-      );
+      // Arrange (Preparar)
+      const errorType = ErrorType.APPLICATION;
+      const errorMessage = 'Error de prueba';
+      const expectedSource = 'unknown';
+
+      // Act (Actuar)
+      const exception = new ResultException(errorType, errorMessage);
 
       // Assert (Verificar)
-      const expectedSource = 'unknown';
       expect(exception.details.source).toBe(expectedSource);
     });
   });
