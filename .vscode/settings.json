@@ -3,7 +3,10 @@
   "iridium.npm.packageManager": "bun",
   "cSpell.language": "en,es",
   "cSpell.words": [
+    "centralizadamente",
     "manejador",
+    "Serialización",
+    "serializar",
     "tipado"
   ],
 }
