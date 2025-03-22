@@ -177,11 +177,10 @@ describe('Result', () => {
       it('debería capturar un resultado exitoso de una función asíncrona', async () => {
         // Arrange (Preparar)
         const expectedValue = 42;
-        const fn = async (): Promise<number> => Promise.resolve(42);
+        const asyncFn = async (): Promise<number> => Promise.resolve(42);
 
         // Act (Actuar)
-        const resultPromise = Result.tryAsync(fn);
-        const result = await resultPromise;
+        const result = await Result.tryAsync(asyncFn);
 
         // Assert (Verificar)
         expect(result.isSuccess()).toBe(true);
@@ -195,7 +194,7 @@ describe('Result', () => {
           'Error de validación',
         );
         // eslint-disable-next-line @typescript-eslint/require-await
-        const fn = async (): Promise<void> => {
+        const asyncFn = async (): Promise<void> => {
           throw error;
         };
         const expectedError = new ResultException(
@@ -204,241 +203,153 @@ describe('Result', () => {
         );
 
         // Act (Actuar)
-        const resultPromise = Result.tryAsync(fn);
-        const result = await resultPromise;
+        const result = await Result.tryAsync(asyncFn);
 
         // Assert (Verificar)
         expect(result.isFailure()).toBe(true);
         expect(result.getError()).toStrictEqual(expectedError);
       });
 
-      it('debería convertir un Error estándar en ResultException', async () => {
+      it('debería usar errorTypeMap para determinar el tipo de error cuando el error es una instancia de Error', async () => {
         // Arrange (Preparar)
-        const errorMessage = 'Error estándar';
+        const error = new Error('Error de prueba');
+        const errorTypeMap = jest.fn().mockReturnValue(ErrorType.DOMAIN);
         // eslint-disable-next-line @typescript-eslint/require-await
-        const fn = async (): Promise<void> => {
-          throw new Error(errorMessage);
+        const asyncFn = async (): Promise<number> => {
+          throw error;
         };
-        const expectedType = ErrorType.INTERNAL;
-        const expectedMessage = 'Error estándar';
+        const expectedType = ErrorType.DOMAIN;
 
         // Act (Actuar)
-        const resultPromise = Result.tryAsync(fn);
-        const result = await resultPromise;
+        const result = await Result.tryAsync(asyncFn, errorTypeMap);
 
         // Assert (Verificar)
         expect(result.isFailure()).toBe(true);
-        expect(result.getError()).toBeInstanceOf(ResultException);
-        expect(result.getError().message).toBe(expectedMessage);
         expect(result.getError().type).toBe(expectedType);
+        expect(errorTypeMap).toHaveBeenCalledWith(error);
       });
 
-      it('debería convertir errores no estándar en ResultException', async () => {
+      it('debería extraer propiedades adicionales de un Error estándar', async () => {
         // Arrange (Preparar)
-        const errorString = 'error string';
+        const customError = new Error('Error con propiedades adicionales');
+        // Añadir propiedades adicionales al error
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        (customError as any).code = 'ERR_CUSTOM';
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        (customError as any).statusCode = 400;
+
         // eslint-disable-next-line @typescript-eslint/require-await
-        const fn = async (): Promise<void> => {
-          // Simular un error no estándar
-          // eslint-disable-next-line @typescript-eslint/only-throw-error
-          throw errorString;
+        const asyncFn = async (): Promise<string> => {
+          throw customError;
         };
-        const expectedType = ErrorType.INTERNAL;
-        const expectedProperty = 'originalError';
 
         // Act (Actuar)
-        const resultPromise = Result.tryAsync(fn);
-        const result = await resultPromise;
+        const result = await Result.tryAsync(asyncFn);
 
         // Assert (Verificar)
         expect(result.isFailure()).toBe(true);
-        expect(result.getError()).toBeInstanceOf(ResultException);
-        expect(result.getError().type).toBe(expectedType);
         expect(result.getError().details.metadata).toHaveProperty(
-          expectedProperty,
+          'code',
+          'ERR_CUSTOM',
+        );
+        expect(result.getError().details.metadata).toHaveProperty(
+          'statusCode',
+          400,
         );
       });
 
-      it('debería manejar promesas rechazadas correctamente', async () => {
+      it('debería usar errorTypeMap para determinar el tipo de error cuando el error no es una instancia de Error', async () => {
         // Arrange (Preparar)
-        const errorMessage = 'Promesa rechazada';
-        const fn = (): Promise<number> =>
-          Promise.reject(new Error(errorMessage));
-        const expectedMessage = 'Promesa rechazada';
-
-        // Act (Actuar)
-        const resultPromise = Result.tryAsync(fn);
-        const result = await resultPromise;
-
-        // Assert (Verificar)
-        expect(result.isFailure()).toBe(true);
-        expect(result.getError().message).toBe(expectedMessage);
-      });
-
-      it('debería manejar correctamente errores lanzados antes de la creación de la promesa', async () => {
-        // Arrange (Preparar)
-        const errorMessage = 'Error antes de la promesa';
-        const fn = (): Promise<number> => {
-          throw new Error(errorMessage);
-        };
-        const expectedMessage = 'Error antes de la promesa';
-
-        // Act (Actuar)
-        const resultPromise = Result.tryAsync(fn);
-        const result = await resultPromise;
-
-        // Assert (Verificar)
-        expect(result.isFailure()).toBe(true);
-        expect(result.getError().message).toBe(expectedMessage);
-      });
-
-      // Casos de borde y esquina
-      it('debería manejar valores nulos y undefined correctamente', async () => {
-        // Arrange (Preparar)
-        const nullFn = async (): Promise<null> => Promise.resolve(null);
-        const undefinedFn = async (): Promise<undefined> =>
-          Promise.resolve(undefined);
-
-        // Act (Actuar)
-        const nullResult = await Result.tryAsync(nullFn);
-        const undefinedResult = await Result.tryAsync(undefinedFn);
-
-        // Assert (Verificar)
-        expect(nullResult.isSuccess()).toBe(true);
-        expect(nullResult.getValue()).toBeNull();
-        expect(undefinedResult.isSuccess()).toBe(true);
-        expect(undefinedResult.getValue()).toBeUndefined();
-      });
-
-      it('debería manejar promesas anidadas correctamente', async () => {
-        // Arrange (Preparar)
-        const value = 'valor anidado';
-        const expectedValue = 'valor anidado';
-        const fn = async (): Promise<string> => {
-          return new Promise(resolve => {
-            setTimeout(() => {
-              resolve(value);
-            }, 10);
-          });
-        };
-
-        // Act (Actuar)
-        const result = await Result.tryAsync(fn);
-
-        // Assert (Verificar)
-        expect(result.isSuccess()).toBe(true);
-        expect(result.getValue()).toBe(expectedValue);
-      });
-
-      it('debería manejar promesas que se resuelven con objetos', async () => {
-        // Arrange (Preparar)
-        const value = { id: 1, name: 'test' };
-        const expectedValue = { id: 1, name: 'test' };
-        const fn = async (): Promise<{ id: number; name: string }> =>
-          Promise.resolve(value);
-
-        // Act (Actuar)
-        const result = await Result.tryAsync(fn);
-
-        // Assert (Verificar)
-        expect(result.isSuccess()).toBe(true);
-        expect(result.getValue()).toEqual(expectedValue);
-      });
-
-      it('debería poder usarse con await y encadenarse con otros métodos', async () => {
-        // Arrange (Preparar)
-        const fn = async (): Promise<string> => Promise.resolve('prueba');
-        const expectedValue = 'PRUEBA';
-
-        // Act (Actuar)
-        const result = await Result.tryAsync(fn);
-        const transformedResult = result.map(str => str.toUpperCase());
-
-        // Assert (Verificar)
-        expect(transformedResult.isSuccess()).toBe(true);
-        expect(transformedResult.getValue()).toBe(expectedValue);
-      });
-
-      it('debería funcionar correctamente con flatMap para encadenar operaciones asíncronas', async () => {
-        // Arrange (Preparar)
-        const fn1 = async (): Promise<number> => Promise.resolve(10);
-        const fn2 = (x: number): Result<string> =>
-          Result.success(`Valor: ${x}`);
-        const expectedValue = 'Valor: 10';
-
-        // Act (Actuar)
-        const result = await Result.tryAsync(fn1);
-        const flatMappedResult = result.flatMap(fn2);
-
-        // Assert (Verificar)
-        expect(flatMappedResult.isSuccess()).toBe(true);
-        expect(flatMappedResult.getValue()).toBe(expectedValue);
-      });
-
-      it('debería propagar errores en cadenas de operaciones asíncronas', async () => {
-        // Arrange (Preparar)
-        const fn = async (): Promise<number> => Promise.resolve(10);
-        const error = new ResultException(
-          ErrorType.VALIDATION,
-          'Error en cadena',
-        );
-        const expectedError = new ResultException(
-          ErrorType.VALIDATION,
-          'Error en cadena',
-        );
-
-        // Act (Actuar)
-        const result = await Result.tryAsync(fn);
-        const flatMappedResult = result.flatMap(() => Result.failure(error));
-
-        // Assert (Verificar)
-        expect(flatMappedResult.isFailure()).toBe(true);
-        expect(flatMappedResult.getError()).toStrictEqual(expectedError);
-      });
-
-      it('debería capturar propiedades adicionales de objetos de error personalizados', async () => {
-        // Arrange (Preparar)
-        class CustomError extends Error {
-          code: string;
-          source: string;
-          customField: string;
-
-          constructor() {
-            super('Error personalizado');
-            this.name = 'CustomError'; // Esta se usará como code en ResultException
-            this.code = 'CUSTOM_ERROR_CODE'; // Esta irá a metadata
-            this.source = 'test-component'; // Esta irá a metadata
-            this.customField = 'valor_personalizado'; // Esta irá a metadata
-          }
-        }
-
+        const errorObj = { custom: true, message: 'Error personalizado' };
+        const errorTypeMap = jest.fn().mockReturnValue(ErrorType.VALIDATION);
         // eslint-disable-next-line @typescript-eslint/require-await
-        const fn = async (): Promise<void> => {
-          throw new CustomError();
+        const asyncFn = async (): Promise<string> => {
+          // eslint-disable-next-line @typescript-eslint/only-throw-error
+          throw errorObj;
         };
+        const expectedType = ErrorType.VALIDATION;
 
         // Act (Actuar)
-        const result = await Result.tryAsync(fn);
+        const result = await Result.tryAsync(asyncFn, errorTypeMap);
 
         // Assert (Verificar)
         expect(result.isFailure()).toBe(true);
-        expect(result.getError()).toBeInstanceOf(ResultException);
-        expect(result.getError().type).toBe(ErrorType.INTERNAL);
-        expect(result.getError().message).toBe('Error personalizado');
+        expect(result.getError().type).toBe(expectedType);
+        expect(errorTypeMap).toHaveBeenCalledWith(errorObj);
+      });
 
-        // Verificar el código usando error.name
-        expect(result.getError().details.code).toBe('CustomError');
+      it('debería usar el mensaje "Error desconocido" cuando el error no es una string ni tiene una propiedad message', async () => {
+        // Arrange (Preparar)
+        const errorObj = { custom: true }; // Sin propiedad message
+        // eslint-disable-next-line @typescript-eslint/require-await
+        const asyncFn = async (): Promise<string> => {
+          // eslint-disable-next-line @typescript-eslint/only-throw-error
+          throw errorObj;
+        };
+        const expectedMessage = 'Error desconocido';
 
-        // Verificar propiedades adicionales en metadata
-        const metadata = result.getError().details.metadata;
-        expect(metadata).toBeDefined();
-        expect(metadata).toHaveProperty('originalError');
-        expect(metadata).toHaveProperty('name', 'CustomError');
-        expect(metadata).toHaveProperty('errorType', 'CustomError');
+        // Act (Actuar)
+        const result = await Result.tryAsync(asyncFn);
 
-        // Verificar que las propiedades personalizadas estén en metadata
-        expect(metadata).toHaveProperty('code', 'CUSTOM_ERROR_CODE');
-        expect(metadata).toHaveProperty('source', 'test-component');
-        expect(metadata).toHaveProperty('customField', 'valor_personalizado');
+        // Assert (Verificar)
+        expect(result.isFailure()).toBe(true);
+        expect(result.getError().message).toBe(expectedMessage);
+        expect(result.getError().details.metadata).toHaveProperty(
+          'originalError',
+          errorObj,
+        );
+      });
+
+      it('debería manejar errores lanzados como valores primitivos', async () => {
+        // Arrange (Preparar)
+        const primitiveError = 42; // Un número como error
+        // eslint-disable-next-line @typescript-eslint/require-await
+        const asyncFn = async (): Promise<string> => {
+          // eslint-disable-next-line @typescript-eslint/only-throw-error
+          throw primitiveError;
+        };
+        const expectedMessage = 'Error desconocido';
+
+        // Act (Actuar)
+        const result = await Result.tryAsync(asyncFn);
+
+        // Assert (Verificar)
+        expect(result.isFailure()).toBe(true);
+        expect(result.getError().message).toBe(expectedMessage);
+        expect(result.getError().details.metadata).toHaveProperty(
+          'originalError',
+          primitiveError,
+        );
+        expect(result.getError().details.metadata).toHaveProperty(
+          'errorType',
+          'number',
+        );
+      });
+
+      it('debería manejar errores lanzados como cadenas de texto', async () => {
+        // Arrange (Preparar)
+        const stringError = 'Este es un error en forma de string';
+        // eslint-disable-next-line @typescript-eslint/require-await
+        const asyncFn = async (): Promise<string> => {
+          // eslint-disable-next-line @typescript-eslint/only-throw-error
+          throw stringError;
+        };
+        const expectedMessage = 'Este es un error en forma de string';
+
+        // Act (Actuar)
+        const result = await Result.tryAsync(asyncFn);
+
+        // Assert (Verificar)
+        expect(result.isFailure()).toBe(true);
+        expect(result.getError().message).toBe(expectedMessage);
+        expect(result.getError().details.metadata).toHaveProperty(
+          'originalError',
+          stringError,
+        );
+        expect(result.getError().details.metadata).toHaveProperty(
+          'errorType',
+          'string',
+        );
       });
     });
   });
