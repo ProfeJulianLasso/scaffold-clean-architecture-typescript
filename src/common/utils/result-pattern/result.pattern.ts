@@ -142,6 +142,82 @@ export class Result<SuccessValue> {
   }
 
   /**
+   * Crea un resultado a partir de una función asíncrona que puede lanzar excepciones.
+   * Preserva los detalles del error original independientemente de su origen.
+   *
+   * @param fn - Función asíncrona que puede lanzar excepciones
+   * @param errorTypeMap - Función opcional para determinar el tipo de error según la excepción
+   * @returns Una promesa que resuelve a un resultado exitoso o un resultado fallido con la excepción capturada
+   */
+  public static async tryAsync<SuccessValue>(
+    fn: () => Promise<SuccessValue>,
+    errorTypeMap?: (error: unknown) => ErrorType,
+  ): Promise<Result<SuccessValue>> {
+    try {
+      const value = await fn();
+      return Result.success(value);
+    } catch (error: unknown) {
+      // Si ya es un ResultException, simplemente lo usamos
+      if (error instanceof ResultException) {
+        return Result.failure<SuccessValue>(error);
+      }
+
+      // Para errores nativos de JavaScript
+      else if (error instanceof Error) {
+        // Determinar el tipo de error
+        const errorType = errorTypeMap
+          ? errorTypeMap(error)
+          : ErrorType.INTERNAL;
+
+        // Extraer todas las propiedades no estándar del error
+        const additionalProps: Record<string, unknown> = {};
+
+        // Capturar propiedades del objeto Error que no sean parte del estándar
+        Object.getOwnPropertyNames(error).forEach(prop => {
+          if (prop !== 'name' && prop !== 'message' && prop !== 'stack') {
+            // Acceso a propiedades con seguridad de tipos
+            additionalProps[prop] = (
+              error as unknown as Record<string, unknown>
+            )[prop];
+          }
+        });
+
+        return Result.failure<SuccessValue>(
+          new ResultException(errorType, error.message, {
+            code: error.name,
+            metadata: {
+              originalError: error,
+              name: error.name,
+              stack: error.stack,
+              errorType: error.constructor.name,
+              ...additionalProps,
+            },
+          }),
+        );
+      }
+
+      // Para cualquier otro tipo de error (objetos, strings, etc.)
+      else {
+        const errorType = errorTypeMap
+          ? errorTypeMap(error)
+          : ErrorType.INTERNAL;
+
+        const errorMessage =
+          typeof error === 'string' ? error : 'Error desconocido';
+
+        return Result.failure<SuccessValue>(
+          new ResultException(errorType, errorMessage, {
+            metadata: {
+              originalError: error,
+              errorType: typeof error,
+            },
+          }),
+        );
+      }
+    }
+  }
+
+  /**
    * Transforma el valor de un resultado exitoso mediante una función.
    * Si el resultado es fallido, devuelve el resultado fallido sin cambios.
    *
