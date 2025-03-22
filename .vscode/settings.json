@@ -3,6 +3,7 @@
   "iridium.npm.packageManager": "bun",
   "cSpell.language": "en,es",
   "cSpell.words": [
+    "manejador",
     "tipado"
   ],
 }
