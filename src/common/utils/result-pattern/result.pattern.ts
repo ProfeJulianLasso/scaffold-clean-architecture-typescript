@@ -4,7 +4,7 @@
  * una interfaz consistente y declarativa para el manejo de errores en la aplicación.
  */
 
-import { ErrorType, ResultException } from '../../exceptions/result.exception';
+import { ErrorType, ResultException } from '@common/exceptions';
 
 /**
  * Clase genérica que representa el resultado de una operación.

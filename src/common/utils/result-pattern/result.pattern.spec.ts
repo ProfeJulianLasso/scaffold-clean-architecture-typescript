@@ -1,4 +1,4 @@
-import { ErrorType, ResultException } from '../../exceptions/result.exception';
+import { ErrorType, ResultException } from '@common/exceptions';
 import { Result } from './result.pattern';
 
 /**

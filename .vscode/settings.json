@@ -1,12 +1,33 @@
 {
   "npm.packageManager": "bun",
   "iridium.npm.packageManager": "bun",
+  "explorer.fileNesting.patterns": {
+    "package.json": ".*,*.json,*.yaml,*yml,*.js,*.md,Gemfile,*.properties,*.lock,jest.config.ts,bun.lockb,*.sql,*.txt,*.mjs,*.ts",
+    "*.d.ts": "$(capture).js,$(capture).js.map",
+    "*.ts": "*.d.ts,$(capture).js,$(capture).js.map,${capture}.spec.ts,${capture}.example.ts",
+  },
   "cSpell.language": "en,es",
+  "cSpell.ignorePaths": [
+    "package-lock.json",
+    "node_modules",
+    "vscode-extension",
+    ".git/{info,lfs,logs,refs,objects}/**",
+    ".git/{index,*refs,*HEAD}",
+    ".vscode",
+    ".vscode-insiders",
+    ".gitignore",
+    "bun.lock",
+  ],
   "cSpell.words": [
     "centralizadamente",
+    "contextualización",
     "janedoe",
     "johndoe",
     "manejador",
+    "parseo",
+    "Parseo",
+    "Serializa",
+    "serialización",
     "Serialización",
     "serializar",
     "tipado"

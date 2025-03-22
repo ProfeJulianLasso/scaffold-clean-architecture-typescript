@@ -4,7 +4,7 @@
  * para manejar resultados de operaciones y errores de manera elegante.
  */
 
-import { ErrorType, ResultException } from '../../exceptions/result.exception';
+import { ErrorType, ResultException } from '@common/exceptions';
 import { Result } from './result.pattern';
 
 /**
