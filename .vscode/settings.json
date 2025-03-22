@@ -1,11 +1,8 @@
 {
   "npm.packageManager": "bun",
   "iridium.npm.packageManager": "bun",
+  "cSpell.language": "en,es",
   "cSpell.words": [
-    "contextualización",
-    "manejador",
-    "Serializa",
-    "serialización",
-    "serializar"
+    "tipado"
   ],
 }
