@@ -1,7 +1,7 @@
 import { ErrorType, ResultException } from '@common/exceptions';
 import { StringValueObject } from '@common/value-objects';
 import * as bcrypt from 'bcrypt';
-import { PasswordPolicy } from '../../../policies/password.policy';
+import { passwordPolicy } from 'src/context/domain/policies';
 
 /**
  * Opciones para la creación de una contraseña
@@ -63,7 +63,7 @@ export class UserPassword extends StringValueObject {
     }
 
     // Si no está hasheada, aplicamos la política de seguridad
-    const securityResult = PasswordPolicy.validateSecurity(value);
+    const securityResult = passwordPolicy.validateSecurity(value);
 
     if (securityResult.isFailure()) {
       this.reportError(securityResult.getError().message, 'UserPassword', {
@@ -76,7 +76,7 @@ export class UserPassword extends StringValueObject {
    * Hash de la contraseña usando bcrypt
    * @returns Promise con el hash de la contraseña
    */
-  public async hash(): Promise<UserPassword> {
+  async hash(): Promise<UserPassword> {
     // Si ya está hasheada, devolvemos la misma instancia
     if (this.isHashed) {
       return this;
@@ -94,7 +94,7 @@ export class UserPassword extends StringValueObject {
    * @param plainTextPassword - Contraseña en texto plano a verificar
    * @returns Promise<boolean> - true si coincide, false en caso contrario
    */
-  public async compare(plainTextPassword: string): Promise<boolean> {
+  async compare(plainTextPassword: string): Promise<boolean> {
     // Si esta instancia no está hasheada, no podemos comparar
     if (!this.isHashed) {
       throw new ResultException(
@@ -122,7 +122,7 @@ export class UserPassword extends StringValueObject {
    * Sobreescribimos toJSON para nunca exponer la contraseña
    * @returns Un objeto que oculta la contraseña
    */
-  public toJSON(): object {
+  toJSON(): object {
     return {
       isHashed: this.isHashed,
       // No incluimos el valor de la contraseña
@@ -133,7 +133,7 @@ export class UserPassword extends StringValueObject {
    * Sobreescribimos toString para nunca exponer la contraseña
    * @returns Un string que indica que es una contraseña protegida
    */
-  public toString(): string {
+  toString(): string {
     return '[PROTECTED PASSWORD]';
   }
 }

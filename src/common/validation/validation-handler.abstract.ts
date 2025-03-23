@@ -53,7 +53,7 @@ export abstract class ValidationHandler {
    *
    * @returns true si hay al menos un error, false en caso contrario
    */
-  public hasErrors(): boolean {
+  hasErrors(): boolean {
     return this._errors.length > 0;
   }
 
@@ -62,7 +62,7 @@ export abstract class ValidationHandler {
    *
    * @returns Array con todos los errores de validación
    */
-  public getErrors(): IValidationError[] {
+  getErrors(): IValidationError[] {
     return [...this._errors];
   }
 
@@ -72,7 +72,7 @@ export abstract class ValidationHandler {
    * @param entityName - Nombre de la entidad o valor objeto que se está validando
    * @throws {ResultException} Si hay errores de validación registrados
    */
-  public throwIfHasErrors(entityName: string): void {
+  throwIfHasErrors(entityName: string): void {
     if (this.hasErrors()) {
       throw new ResultException(
         ErrorType.VALIDATION,
@@ -90,7 +90,7 @@ export abstract class ValidationHandler {
    *
    * @param handler - Otro handler cuyos errores se añadirán a este
    */
-  public combineWith(handler: ValidationHandler): void {
+  combineWith(handler: ValidationHandler): void {
     if (handler.hasErrors()) {
       this._errors = [...this._errors, ...handler.getErrors()];
     }
@@ -99,7 +99,7 @@ export abstract class ValidationHandler {
   /**
    * Limpia todos los errores registrados
    */
-  public clearErrors(): void {
+  clearErrors(): void {
     this._errors = [];
   }
 }

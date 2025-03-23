@@ -103,7 +103,7 @@ export abstract class IDValueObject extends ValueObject<string> {
    * Obtiene el objeto UUIDv7 subyacente
    * @returns Instancia de UUIDv7
    */
-  public get uuid(): UUIDv7 {
+  get uuid(): UUIDv7 {
     return this._uuid;
   }
 
@@ -111,7 +111,7 @@ export abstract class IDValueObject extends ValueObject<string> {
    * Obtiene el timestamp del ID
    * @returns Timestamp en milisegundos
    */
-  public getTimestamp(): number {
+  getTimestamp(): number {
     return this._uuid.getTimestamp();
   }
 
@@ -119,7 +119,7 @@ export abstract class IDValueObject extends ValueObject<string> {
    * Obtiene la fecha de creación del ID
    * @returns Fecha de creación
    */
-  public getDate(): Date {
+  getDate(): Date {
     return this._uuid.getDate();
   }
 
@@ -128,7 +128,7 @@ export abstract class IDValueObject extends ValueObject<string> {
    * @param other - Otro ID para comparar
    * @returns Número negativo si este ID es menor, positivo si es mayor, 0 si son iguales
    */
-  public compareTo(other: IDValueObject): number {
+  compareTo(other: IDValueObject): number {
     return this._uuid.compareTo(other.uuid);
   }
 }

@@ -17,7 +17,6 @@ export class UserID extends IDValueObject {
    * Implementación de la validación específica para IDs de usuario
    * @param value - Valor a validar
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
   protected validateID(value: string): void {
     // Aquí podríamos agregar validaciones específicas para IDs de usuario
     // Por ejemplo, verificar si pertenece a un rango específico o cumple con reglas adicionales

@@ -1,4 +1,4 @@
-import { INestApplication, Logger } from '@nestjs/common';
+import { type INestApplication, Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import helmet from 'helmet';
 import { getConfig, initializeConfig } from './config';
@@ -14,7 +14,6 @@ initializeConfig();
  */
 function configureApp(app: INestApplication): INestApplication {
   // Aplicar helmet como middleware
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   app.use(helmet());
 
   // Configuración de ValidationPipe

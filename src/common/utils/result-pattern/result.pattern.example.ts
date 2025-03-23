@@ -11,11 +11,11 @@ import { Result } from './result.pattern';
  * 1. EJEMPLOS BÁSICOS
  * Demostración del uso básico de los métodos success y failure
  */
-export class BasicExamples {
+const basicExamples = {
   /**
    * Ejemplo de creación de resultados exitosos
    */
-  static successExample(): void {
+  successExample(): void {
     // Crear un resultado exitoso con un valor
     const numberResult = Result.success(42);
     console.log('Es exitoso:', numberResult.isSuccess()); // true
@@ -28,12 +28,12 @@ export class BasicExamples {
     // Crear un resultado exitoso sin valor (undefined)
     const emptyResult = Result.success();
     console.log('Valor vacío:', emptyResult.getValue()); // undefined
-  }
+  },
 
   /**
    * Ejemplo de creación de resultados fallidos
    */
-  static failureExample(): void {
+  failureExample(): void {
     // Crear un resultado fallido con una excepción
     const error = new ResultException(
       ErrorType.VALIDATION,
@@ -54,12 +54,12 @@ export class BasicExamples {
     const resultError = failedResult.getError();
     console.log('Tipo de error:', resultError.type); // VALIDATION
     console.log('Mensaje:', resultError.message); // El campo email no es válido
-  }
+  },
 
   /**
    * Ejemplo de creación de resultados fallidos con el método fail
    */
-  static failShorthandExample(): void {
+  failShorthandExample(): void {
     // Crear un resultado fallido usando el método estático fail
     const notFoundResult = Result.fail<{ id: number; name: string }>(
       ErrorType.NOT_FOUND,
@@ -74,18 +74,18 @@ export class BasicExamples {
     const error = notFoundResult.getError();
     console.log('Código HTTP:', error.statusCode); // 404
     console.log('Detalles:', error.details); // { code: 'USER_NOT_FOUND', ... }
-  }
-}
+  },
+};
 
 /**
  * 2. EJEMPLOS DE TRANSFORMACIÓN Y ENCADENAMIENTO
  * Demostración del uso de map y flatMap para transformar resultados
  */
-export class TransformationExamples {
+const transformationExamples = {
   /**
    * Ejemplo de uso del método map para transformar un valor
    */
-  static mapExample(): void {
+  mapExample(): void {
     // Comenzar con un resultado exitoso
     const initialResult = Result.success(5);
 
@@ -100,12 +100,12 @@ export class TransformationExamples {
       .map(text => text.toUpperCase()); // "EL VALOR ES: 10"
 
     console.log('Resultado final:', finalResult.getValue());
-  }
+  },
 
   /**
    * Ejemplo de gestión de errores en transformaciones
    */
-  static mapErrorHandlingExample(): void {
+  mapErrorHandlingExample(): void {
     const result = Result.success(5);
 
     // Si la función de transformación lanza una excepción, se convierte en un resultado fallido
@@ -121,12 +121,12 @@ export class TransformationExamples {
 
     console.log('Es fallido:', errorResult.isFailure()); // true
     console.log('Mensaje de error:', errorResult.getError().message);
-  }
+  },
 
   /**
    * Ejemplo de uso del método flatMap para encadenar operaciones que devuelven Result
    */
-  static flatMapExample(): void {
+  flatMapExample(): void {
     // Una función que devuelve un Result
     const divide = (a: number, b: number): Result<number> => {
       if (b === 0) {
@@ -156,23 +156,23 @@ export class TransformationExamples {
       .flatMap(value => divide(value, 2)); // No se ejecuta
 
     console.log('Resultado encadenado fallido:', chainedResult.isFailure()); // true
-  }
-}
+  },
+};
 
 /**
  * 3. EJEMPLOS DE MANEJO DE ERRORES
  * Demostración de técnicas para manejar resultados fallidos
  */
-export class ErrorHandlingExamples {
+const errorHandlingExamples = {
   /**
    * Ejemplo de uso del método fold para manejar ambos casos
    */
-  static foldExample(): void {
+  foldExample(): void {
     // Función que puede devolver éxito o fracaso
     const parseAge = (input: string): Result<number> => {
-      const age = parseInt(input, 10);
+      const age = Number.parseInt(input, 10);
 
-      if (isNaN(age)) {
+      if (Number.isNaN(age)) {
         return Result.fail(
           ErrorType.VALIDATION,
           'La edad debe ser un número válido',
@@ -192,7 +192,7 @@ export class ErrorHandlingExamples {
     // Casos de prueba
     const inputs = ['25', 'abc', '150'];
 
-    inputs.forEach(input => {
+    for (const input of inputs) {
       const result = parseAge(input);
 
       // Usar fold para manejar ambos casos (éxito y fracaso)
@@ -204,13 +204,13 @@ export class ErrorHandlingExamples {
       );
 
       console.log(`Entrada "${input}": ${message}`);
-    });
-  }
+    }
+  },
 
   /**
    * Ejemplo de uso del método recover para manejar errores
    */
-  static recoverExample(): void {
+  recoverExample(): void {
     // Función que simula buscar un usuario por ID
     const findUserById = (id: string): Result<{ id: string; name: string }> => {
       // Simular que el usuario con ID "999" no existe
@@ -232,12 +232,12 @@ export class ErrorHandlingExamples {
     );
 
     console.log('Usuario recuperado:', recoveredResult.getValue());
-  }
+  },
 
   /**
    * Ejemplo de uso de los métodos onSuccess y onFailure para efectos secundarios
    */
-  static sideEffectsExample(): void {
+  sideEffectsExample(): void {
     // Simular una validación de email
     const validateEmail = (email: string): Result<string> => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -268,12 +268,12 @@ export class ErrorHandlingExamples {
         console.error(`Error: ${error.message}`);
         // Aquí podríamos mostrar un mensaje de error, resaltar el campo, etc.
       });
-  }
+  },
 
   /**
    * Ejemplo de uso de unwrap y unwrapOr
    */
-  static unwrapExample(): void {
+  unwrapExample(): void {
     // Resultado exitoso
     const successResult = Result.success(42);
 
@@ -281,7 +281,6 @@ export class ErrorHandlingExamples {
     try {
       const value = successResult.unwrap();
       console.log('Valor unwrapped:', value); // 42
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
     } catch (error: unknown) {
       console.error('Este código no se ejecutará para resultados exitosos');
     }
@@ -305,22 +304,21 @@ export class ErrorHandlingExamples {
     // unwrapOr devuelve un valor por defecto para resultados fallidos
     const defaultValue = failureResult.unwrapOr(0);
     console.log('Valor con unwrapOr:', defaultValue); // 0
-  }
-}
+  },
+};
 
 /**
  * 4. EJEMPLOS DE OPERACIONES TRY
  * Demostración del uso de try y tryAsync para capturar excepciones
  */
-export class TryExamples {
+const tryExamples = {
   /**
    * Ejemplo de uso del método try para capturar excepciones
    */
-  static tryExample(): void {
+  tryExample(): void {
     // Función que puede lanzar una excepción
     const parseJSON = (input: string): Result<unknown> => {
       return Result.try(() => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return JSON.parse(input);
       });
     };
@@ -334,12 +332,12 @@ export class TryExamples {
     const invalidJSON = '{name: John}'; // JSON inválido
     const failureResult = parseJSON(invalidJSON);
     console.log('Error de parseo:', failureResult.getError().message);
-  }
+  },
 
   /**
    * Ejemplo de uso del método tryAsync para operaciones asíncronas
    */
-  static async tryAsyncExample(): Promise<void> {
+  async tryAsyncExample(): Promise<void> {
     // Función asíncrona que simula una petición HTTP
     const fetchUserData = async (userId: string): Promise<unknown> => {
       // Simular una petición HTTP que puede fallar
@@ -388,18 +386,18 @@ export class TryExamples {
       'Tipo de error personalizado:',
       customMappingResult.getError().type,
     );
-  }
-}
+  },
+};
 
 /**
  * 5. EJEMPLOS DE COMBINACIÓN DE RESULTADOS
  * Demostración de cómo combinar múltiples resultados
  */
-export class CombinationExamples {
+const combinationExamples = {
   /**
    * Ejemplo de uso del método combine para procesar múltiples resultados
    */
-  static combineExample(): void {
+  combineExample(): void {
     // Función que valida un campo
     const validateField = (
       name: string,
@@ -448,12 +446,12 @@ export class CombinationExamples {
 
     console.log('¿Combinación inválida?', invalidCombinedResult.isFailure());
     console.log('Error:', invalidCombinedResult.getError().message);
-  }
+  },
 
   /**
    * Ejemplo de procesamiento de múltiples operaciones asíncronas
    */
-  static async asyncCombineExample(): Promise<void> {
+  async asyncCombineExample(): Promise<void> {
     // Simular operaciones asíncronas
     const fetchUserProfile = async (
       userId: string,
@@ -474,7 +472,6 @@ export class CombinationExamples {
     };
 
     const fetchUserOrders = async (
-      // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
       userId: string,
     ): Promise<Result<object[]>> => {
       try {
@@ -510,18 +507,18 @@ export class CombinationExamples {
         combinedResult.getError().message,
       );
     }
-  }
-}
+  },
+};
 
 /**
  * 6. CASOS DE USO REALES
  * Ejemplos de uso del patrón Result en servicios y controladores
  */
-export class RealWorldExamples {
+const realWorldExamples = {
   /**
    * Ejemplo de un servicio de autenticación usando el patrón Result
    */
-  static userAuthenticationService(): void {
+  userAuthenticationService(): void {
     interface User {
       id: string;
       email: string;
@@ -605,12 +602,12 @@ export class RealWorldExamples {
       const error = loginResult.getError();
       console.error(`Error (${error.type}): ${error.message}`);
     }
-  }
+  },
 
   /**
    * Ejemplo de un controlador para gestión de usuarios
    */
-  static userController(): void {
+  userController(): void {
     interface User {
       id: string;
       name: string;
@@ -676,7 +673,6 @@ export class RealWorldExamples {
 
     // Simulación de un controlador HTTP
     class UserController {
-      // eslint-disable-next-line no-unused-vars
       constructor(private readonly _userService: UserService) {}
 
       /**
@@ -756,13 +752,13 @@ export class RealWorldExamples {
         name: string;
         email: string;
       }): Result<void> {
-        if (!data.name || !data.name.trim()) {
+        if (!data?.name?.trim()) {
           return Result.fail(ErrorType.VALIDATION, 'El nombre es obligatorio', {
             code: 'MISSING_NAME',
           });
         }
 
-        if (!data.email || !data.email.trim()) {
+        if (!data?.email?.trim()) {
           return Result.fail(ErrorType.VALIDATION, 'El email es obligatorio', {
             code: 'MISSING_EMAIL',
           });
@@ -808,12 +804,12 @@ export class RealWorldExamples {
         email: 'invalid-email',
       }),
     );
-  }
+  },
 
   /**
    * Ejemplo de uso en un repositorio con operaciones de base de datos
    */
-  static async databaseRepository(): Promise<void> {
+  async databaseRepository(): Promise<void> {
     interface Product {
       id: string;
       name: string;
@@ -987,18 +983,18 @@ export class RealWorldExamples {
       const error = overReserveResult.getError();
       console.error(`Error esperado (${error.type}): ${error.message}`);
     }
-  }
-}
+  },
+};
 
 /**
  * 7. PATRONES Y BUENAS PRÁCTICAS
  * Recomendaciones y patrones para utilizar Result de manera efectiva
  */
-export class BestPractices {
+const bestPractices = {
   /**
    * Ejemplo de organización por capas usando Result
    */
-  static layeredArchitectureExample(): void {
+  layeredArchitectureExample(): void {
     // Simulación de una arquitectura en capas
 
     // 1. Capa de Repositorio (acceso a datos)
@@ -1025,7 +1021,6 @@ export class BestPractices {
 
     // 2. Capa de Servicio (lógica de negocio)
     class AuthService {
-      // eslint-disable-next-line no-unused-vars
       constructor(private readonly _userRepository: UserRepository) {}
 
       login(email: string, password: string): Result<string> {
@@ -1057,7 +1052,6 @@ export class BestPractices {
 
     // 3. Capa de Controlador (manejo de peticiones)
     class AuthController {
-      // eslint-disable-next-line no-unused-vars
       constructor(private readonly _authService: AuthService) {}
 
       handleLogin(request: { email: string; password: string }): object {
@@ -1102,12 +1096,12 @@ export class BestPractices {
       password: 'wrong_password',
     });
     console.log('Respuesta inválida:', invalidResponse);
-  }
+  },
 
   /**
    * Recomendaciones para un uso efectivo del patrón Result
    */
-  static recommendationsExample(): void {
+  recommendationsExample(): void {
     /**
      * RECOMENDACIONES:
      *
@@ -1144,20 +1138,19 @@ export class BestPractices {
     console.log(
       'Consulta las implementaciones para ver ejemplos de buenas prácticas',
     );
-  }
-}
+  },
+};
 
 /**
  * 8. PATRONES AVANZADOS
  * Técnicas avanzadas para el uso del patrón Result
  */
-export class AdvancedPatterns {
+const advancedPatterns = {
   /**
    * Ejemplo de implementación de un pipeline de procesamiento
    */
-  static pipelineExample(): void {
+  pipelineExample(): void {
     // Definir tipos para el pipeline
-    // eslint-disable-next-line no-unused-vars
     type ValidationFn<T> = (input: T) => Result<T>;
     type Pipeline<T> = ValidationFn<T>[];
 
@@ -1263,12 +1256,12 @@ export class AdvancedPatterns {
     if (invalidResult.isFailure()) {
       console.log('Error de validación:', invalidResult.getError().message);
     }
-  }
+  },
 
   /**
    * Ejemplo de implementación de Railway Oriented Programming
    */
-  static railwayOrientedProgrammingExample(): void {
+  railwayOrientedProgrammingExample(): void {
     // Railway Oriented Programming es un patrón que trata las operaciones
     // como "vías de tren" donde los resultados exitosos siguen por una vía
     // y los fallidos por otra, sin salirse del "carril".
@@ -1383,7 +1376,7 @@ export class AdvancedPatterns {
       return Result.success(user);
     }
 
-    // Función principal que ejecuta todo el proceso usando flatMap
+    // Función principal que ejecuta completamente el proceso usando flatMap
     function registerUser(data: RegistrationData): Result<User> {
       return validateRegistrationData(data)
         .flatMap(checkEmailAvailability)
@@ -1438,38 +1431,38 @@ export class AdvancedPatterns {
         `(${conflictResult.getError().details.code})`,
       );
     }
-  }
-}
+  },
+};
 
 // Ejecutar ejemplos seleccionados (en una aplicación real se importarían los módulos)
 async function runExamples(): Promise<void> {
   // Ejemplos básicos
   console.log('\n== EJEMPLOS BÁSICOS ==');
-  BasicExamples.successExample();
-  BasicExamples.failureExample();
+  basicExamples.successExample();
+  basicExamples.failureExample();
 
   // Ejemplos de transformación
   console.log('\n== EJEMPLOS DE TRANSFORMACIÓN ==');
-  TransformationExamples.mapExample();
-  TransformationExamples.flatMapExample();
+  transformationExamples.mapExample();
+  transformationExamples.flatMapExample();
 
   // Ejemplos de manejo de errores
   console.log('\n== EJEMPLOS DE MANEJO DE ERRORES ==');
-  ErrorHandlingExamples.foldExample();
-  ErrorHandlingExamples.recoverExample();
+  errorHandlingExamples.foldExample();
+  errorHandlingExamples.recoverExample();
 
   // Ejemplos de operaciones asíncronas
   console.log('\n== EJEMPLOS DE OPERACIONES ASÍNCRONAS ==');
-  await TryExamples.tryAsyncExample();
+  await tryExamples.tryAsyncExample();
 
   // Ejemplos de casos de uso reales
   console.log('\n== CASOS DE USO REALES ==');
-  RealWorldExamples.userAuthenticationService();
-  await RealWorldExamples.databaseRepository();
+  realWorldExamples.userAuthenticationService();
+  await realWorldExamples.databaseRepository();
 
   // Patrones avanzados
   console.log('\n== PATRONES AVANZADOS ==');
-  AdvancedPatterns.pipelineExample();
+  advancedPatterns.pipelineExample();
 }
 
 // Ejecutar todos los ejemplos

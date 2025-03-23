@@ -1,5 +1,5 @@
 import { DomainEvent } from '@common/domain-events/domain-event.abstract';
-import { User } from '../entities/user.entity';
+import type { User } from '../entities/user.entity';
 
 /**
  * Evento que se dispara cuando se crea un usuario
@@ -12,11 +12,11 @@ export class UserCreatedEvent extends DomainEvent {
     this._user = user;
   }
 
-  public get user(): User {
+  get user(): User {
     return this._user;
   }
 
-  public toPlainObject(): object {
+  toPlainObject(): object {
     return {
       eventId: this.eventId,
       occurredOn: this.occurredOn,

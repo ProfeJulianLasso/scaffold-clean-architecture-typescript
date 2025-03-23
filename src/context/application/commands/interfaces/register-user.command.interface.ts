@@ -1,6 +1,6 @@
-import { Result } from '@common/utils/result-pattern';
-import { RegisterUserDTORequest } from '../../dtos/requests/register-user.dto.request';
-import { RegisterUserDTOResponse } from '../../dtos/responses/register-user.dto.response';
+import type { Result } from '@common/utils/result-pattern';
+import type { RegisterUserDTORequest } from '../../dtos/requests/register-user.dto.request';
+import type { RegisterUserDTOResponse } from '../../dtos/responses/register-user.dto.response';
 
 /**
  * Interfaz para el comando de registro de usuario

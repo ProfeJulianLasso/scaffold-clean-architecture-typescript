@@ -155,7 +155,6 @@ describe('Result', () => {
         const errorString = 'error string';
         const fn = (): void => {
           // Simular un error no estándar
-          // eslint-disable-next-line @typescript-eslint/only-throw-error
           throw errorString;
         };
         const expectedType = ErrorType.INTERNAL;
@@ -193,7 +192,6 @@ describe('Result', () => {
           ErrorType.VALIDATION,
           'Error de validación',
         );
-        // eslint-disable-next-line @typescript-eslint/require-await
         const asyncFn = async (): Promise<void> => {
           throw error;
         };
@@ -214,7 +212,6 @@ describe('Result', () => {
         // Arrange (Preparar)
         const error = new Error('Error de prueba');
         const errorTypeMap = jest.fn().mockReturnValue(ErrorType.DOMAIN);
-        // eslint-disable-next-line @typescript-eslint/require-await
         const asyncFn = async (): Promise<number> => {
           throw error;
         };
@@ -233,12 +230,12 @@ describe('Result', () => {
         // Arrange (Preparar)
         const customError = new Error('Error con propiedades adicionales');
         // Añadir propiedades adicionales al error
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        (customError as any).code = 'ERR_CUSTOM';
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        (customError as any).statusCode = 400;
+        (customError as Error & { code: string; statusCode: number }).code =
+          'ERR_CUSTOM';
+        (
+          customError as Error & { code: string; statusCode: number }
+        ).statusCode = 400;
 
-        // eslint-disable-next-line @typescript-eslint/require-await
         const asyncFn = async (): Promise<string> => {
           throw customError;
         };
@@ -262,9 +259,7 @@ describe('Result', () => {
         // Arrange (Preparar)
         const errorObj = { custom: true, message: 'Error personalizado' };
         const errorTypeMap = jest.fn().mockReturnValue(ErrorType.VALIDATION);
-        // eslint-disable-next-line @typescript-eslint/require-await
         const asyncFn = async (): Promise<string> => {
-          // eslint-disable-next-line @typescript-eslint/only-throw-error
           throw errorObj;
         };
         const expectedType = ErrorType.VALIDATION;
@@ -281,9 +276,7 @@ describe('Result', () => {
       it('debería usar el mensaje "Error desconocido" cuando el error no es una string ni tiene una propiedad message', async () => {
         // Arrange (Preparar)
         const errorObj = { custom: true }; // Sin propiedad message
-        // eslint-disable-next-line @typescript-eslint/require-await
         const asyncFn = async (): Promise<string> => {
-          // eslint-disable-next-line @typescript-eslint/only-throw-error
           throw errorObj;
         };
         const expectedMessage = 'Error desconocido';
@@ -303,9 +296,7 @@ describe('Result', () => {
       it('debería manejar errores lanzados como valores primitivos', async () => {
         // Arrange (Preparar)
         const primitiveError = 42; // Un número como error
-        // eslint-disable-next-line @typescript-eslint/require-await
         const asyncFn = async (): Promise<string> => {
-          // eslint-disable-next-line @typescript-eslint/only-throw-error
           throw primitiveError;
         };
         const expectedMessage = 'Error desconocido';
@@ -329,9 +320,7 @@ describe('Result', () => {
       it('debería manejar errores lanzados como cadenas de texto', async () => {
         // Arrange (Preparar)
         const stringError = 'Este es un error en forma de string';
-        // eslint-disable-next-line @typescript-eslint/require-await
         const asyncFn = async (): Promise<string> => {
-          // eslint-disable-next-line @typescript-eslint/only-throw-error
           throw stringError;
         };
         const expectedMessage = 'Este es un error en forma de string';
@@ -486,7 +475,6 @@ describe('Result', () => {
         const nonErrorValue = 'este no es un error sino un string';
         const nonErrorValueExpected = 'este no es un error sino un string';
         const transform = (): number => {
-          // eslint-disable-next-line @typescript-eslint/only-throw-error
           throw nonErrorValue; // Lanzamos un valor que no es Error
         };
         const errorTypeExpected = ErrorType.INTERNAL;
@@ -602,7 +590,6 @@ describe('Result', () => {
           message: 'objeto personalizado',
         };
         const chain = (): Result<number> => {
-          // eslint-disable-next-line @typescript-eslint/only-throw-error
           throw nonErrorValue; // Lanzamos un objeto que no es Error
         };
         const errorTypeExpected = ErrorType.INTERNAL;
@@ -615,7 +602,7 @@ describe('Result', () => {
         expect(chainedResult.getError()).toBeInstanceOf(ResultException);
         expect(chainedResult.getError().type).toBe(errorTypeExpected);
         expect(chainedResult.getError().message).toBe(
-          // eslint-disable-next-line @typescript-eslint/no-base-to-string
+          // eslint-disable-next-line
           String(nonErrorValueExpected),
         );
       });
@@ -773,7 +760,6 @@ describe('Result', () => {
         const result = Result.failure<string>(initialError);
         const nonErrorValue = 42; // Un número
         const recovery = (): Result<string> => {
-          // eslint-disable-next-line @typescript-eslint/only-throw-error
           throw nonErrorValue; // Lanzamos un número
         };
         const errorTypeExpected = ErrorType.INTERNAL;
@@ -1047,10 +1033,8 @@ describe('Result', () => {
 
     it('debería manejar objetos circulares sin entrar en bucle infinito', () => {
       // Arrange (Preparar)
-      const circularObj: any = {};
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+      const circularObj: Record<string, unknown> = {};
       circularObj.self = circularObj;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const expectedObj = circularObj;
 
       // Act (Actuar)
@@ -1059,7 +1043,7 @@ describe('Result', () => {
       // Assert (Verificar)
       expect(result.isSuccess()).toBe(true);
       expect(result.getValue()).toBe(expectedObj);
-      expect((result.getValue() as { self: any }).self).toBe(expectedObj);
+      expect((result.getValue() as { self: unknown }).self).toBe(expectedObj);
     });
 
     it('debería manejar errores sin mensaje', () => {
@@ -1103,8 +1087,9 @@ describe('Result', () => {
       const finalResult = initialResult
         .map(x => x * 2) // 10
         .flatMap(x => Result.success(x.toString())) // "10"
+        // biome-ignore lint/style/useTemplate: <explanation>
         .map(s => s + '0') // "100"
-        .map(s => parseInt(s)); // 100
+        .map(s => Number.parseInt(s)); // 100
 
       // Assert (Verificar)
       expect(finalResult.isSuccess()).toBe(true);

@@ -28,19 +28,17 @@ export function basicExceptionExample(): void {
 }
 
 /**
- * Ejemplo 2: Diferentes tipos de errores
- * Demuestra cómo crear excepciones para diferentes escenarios
+ * Diferentes tipos de errores
+ * Funciones para crear excepciones para diferentes escenarios
+ * @module errorExamples
  */
-export class ErrorExamples {
+export const errorExamples = {
   /**
    * Ejemplo de error de validación
    * @param fieldName Nombre del campo que falló la validación
    * @param value Valor inválido
    */
-  static createValidationError(
-    fieldName: string,
-    value: unknown,
-  ): ResultException {
+  createValidationError(fieldName: string, value: unknown): ResultException {
     return new ResultException(
       ErrorType.VALIDATION,
       `El campo '${fieldName}' tiene un valor inválido: ${String(value)}`,
@@ -50,14 +48,14 @@ export class ErrorExamples {
         metadata: { field: fieldName, receivedValue: value },
       },
     );
-  }
+  },
 
   /**
    * Ejemplo de error de recurso no encontrado
    * @param resourceType Tipo de recurso (usuario, producto, etc.)
    * @param resourceId Identificador del recurso
    */
-  static createNotFoundError(
+  createNotFoundError(
     resourceType: string,
     resourceId: string,
   ): ResultException {
@@ -70,7 +68,7 @@ export class ErrorExamples {
         metadata: { resourceType, resourceId },
       },
     );
-  }
+  },
 
   /**
    * Ejemplo de error de conflicto (e.g., entidad duplicada)
@@ -78,7 +76,7 @@ export class ErrorExamples {
    * @param uniqueField Campo único que causó el conflicto
    * @param value Valor que causó el conflicto
    */
-  static createConflictError(
+  createConflictError(
     resourceType: string,
     uniqueField: string,
     value: string,
@@ -92,12 +90,12 @@ export class ErrorExamples {
         metadata: { resourceType, field: uniqueField, value },
       },
     );
-  }
+  },
 
   /**
    * Ejemplo de error de autenticación
    */
-  static createUnauthorizedError(): ResultException {
+  createUnauthorizedError(): ResultException {
     return new ResultException(
       ErrorType.UNAUTHORIZED,
       'Credenciales de autenticación inválidas o faltantes',
@@ -106,7 +104,7 @@ export class ErrorExamples {
         source: 'auth-service',
       },
     );
-  }
+  },
 
   /**
    * Ejemplo de error de autorización
@@ -114,14 +112,14 @@ export class ErrorExamples {
    * @param resource Recurso al que se intentó acceder
    * @param requiredPermission Permiso requerido
    */
-  static createForbiddenError(
+  createForbiddenError(
     userId: string,
     resource: string,
     requiredPermission: string,
   ): ResultException {
     return new ResultException(
       ErrorType.FORBIDDEN,
-      `No tiene permiso para acceder a este recurso`,
+      'No tiene permiso para acceder a este recurso',
       {
         code: 'INSUFFICIENT_PERMISSIONS',
         source: 'authorization-service',
@@ -133,14 +131,14 @@ export class ErrorExamples {
         },
       },
     );
-  }
+  },
 
   /**
    * Ejemplo de error de dominio (reglas de negocio)
    * @param businessRule Regla de negocio violada
    * @param details Detalles sobre la violación de la regla
    */
-  static createDomainError(
+  createDomainError(
     businessRule: string,
     details: Record<string, unknown>,
   ): ResultException {
@@ -153,8 +151,8 @@ export class ErrorExamples {
         metadata: { businessRule, ...details },
       },
     );
-  }
-}
+  },
+};
 
 /**
  * Ejemplo 3: Conversión de errores estándar a ResultException
@@ -220,7 +218,7 @@ export class UserController {
   private async findUserById(userId: string): Promise<Record<string, unknown>> {
     // Simulación: Usuario no encontrado
     if (userId === '999') {
-      throw ErrorExamples.createNotFoundError('usuario', userId);
+      throw errorExamples.createNotFoundError('usuario', userId);
     }
 
     // Simulación: Error interno
@@ -264,7 +262,7 @@ export class TransferService {
 
       // Verificar fondos suficientes (regla de dominio)
       if (sourceAccount.balance < amount) {
-        throw ErrorExamples.createDomainError('FONDOS_INSUFICIENTES', {
+        throw errorExamples.createDomainError('FONDOS_INSUFICIENTES', {
           accountId: sourceAccountId,
           currentBalance: sourceAccount.balance,
           requiredAmount: amount,
@@ -296,12 +294,22 @@ export class TransferService {
  * Este es un ejemplo de cómo se podría implementar un middleware para Express
  * que maneje centralizadamente todos los errores convertidos a ResultException
  */
+// Definir una interfaz para los parámetros del middleware
+interface Request {
+  path: string;
+  method: string;
+}
+
+interface Response {
+  status(code: number): Response;
+  json(body: Record<string, unknown>): void;
+}
+
 export function errorHandlerMiddleware(
   error: Error | ResultException,
-  req: any,
-  res: any,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
-  next: any,
+  req: Request,
+  res: Response,
+  next: unknown,
 ): void {
   // Convertir a ResultException si no lo es ya
   const resultError =
@@ -311,15 +319,12 @@ export function errorHandlerMiddleware(
   console.error('Error capturado:', {
     type: resultError.type,
     message: resultError.message,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
     path: req.path,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     method: req.method,
     timestamp: new Date().toISOString(),
   });
 
   // Enviar respuesta apropiada basada en el error
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
   res.status(resultError.statusCode).json({
     status: 'error',
     ...resultError.toJSON(),

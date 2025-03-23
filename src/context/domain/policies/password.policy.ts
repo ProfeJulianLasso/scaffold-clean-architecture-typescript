@@ -1,25 +1,27 @@
 import { ErrorType } from '@common/exceptions';
 import { Result } from '@common/utils/result-pattern';
-import { UserPassword } from '../aggregates/users/value-objects/user-password.value-object';
+import type { UserPassword } from '../aggregates/users/value-objects/user-password.value-object';
+
+// Patrones para validar los requisitos de seguridad
+const UPPERCASE_PATTERN = /[A-Z]/;
+const LOWERCASE_PATTERN = /[a-z]/;
+const NUMBER_PATTERN = /[0-9]/;
+const SPECIAL_CHAR_PATTERN = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/;
 
 /**
  * Política de dominio para las contraseñas
- * Define reglas de negocio relacionadas con contraseñas
+ *
+ * Define reglas de negocio relacionadas con la seguridad y
+ * gestión de contraseñas de usuarios en el sistema.
+ * @module PasswordPolicy
  */
-export class PasswordPolicy {
-  // Patrones para validar los requisitos de seguridad
-  private static readonly UPPERCASE_PATTERN = /[A-Z]/;
-  private static readonly LOWERCASE_PATTERN = /[a-z]/;
-  private static readonly NUMBER_PATTERN = /[0-9]/;
-  private static readonly SPECIAL_CHAR_PATTERN =
-    /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]+/;
-
+export const passwordPolicy = {
   /**
    * Valida los requisitos de seguridad de una contraseña
    * @param password - Contraseña en texto plano
    * @returns Result con éxito o error
    */
-  public static validateSecurity(password: string): Result<void> {
+  validateSecurity(password: string): Result<void> {
     // Verificar espacios
     if (/\s/.test(password)) {
       return Result.fail(
@@ -33,7 +35,7 @@ export class PasswordPolicy {
     }
 
     // Verificar mayúsculas
-    if (!this.UPPERCASE_PATTERN.test(password)) {
+    if (!UPPERCASE_PATTERN.test(password)) {
       return Result.fail(
         ErrorType.DOMAIN,
         'La contraseña debe contener al menos una letra mayúscula',
@@ -45,7 +47,7 @@ export class PasswordPolicy {
     }
 
     // Verificar minúsculas
-    if (!this.LOWERCASE_PATTERN.test(password)) {
+    if (!LOWERCASE_PATTERN.test(password)) {
       return Result.fail(
         ErrorType.DOMAIN,
         'La contraseña debe contener al menos una letra minúscula',
@@ -57,7 +59,7 @@ export class PasswordPolicy {
     }
 
     // Verificar números
-    if (!this.NUMBER_PATTERN.test(password)) {
+    if (!NUMBER_PATTERN.test(password)) {
       return Result.fail(
         ErrorType.DOMAIN,
         'La contraseña debe contener al menos un número',
@@ -69,7 +71,7 @@ export class PasswordPolicy {
     }
 
     // Verificar caracteres especiales
-    if (!this.SPECIAL_CHAR_PATTERN.test(password)) {
+    if (!SPECIAL_CHAR_PATTERN.test(password)) {
       return Result.fail(
         ErrorType.DOMAIN,
         'La contraseña debe contener al menos un carácter especial',
@@ -81,7 +83,7 @@ export class PasswordPolicy {
     }
 
     return Result.success();
-  }
+  },
 
   /**
    * Verifica si se puede cambiar una contraseña
@@ -90,7 +92,7 @@ export class PasswordPolicy {
    * @param newPassword - Nueva contraseña (ValueObject)
    * @returns Result con éxito o error
    */
-  public static async canChangePassword(
+  async canChangePassword(
     currentPassword: UserPassword,
     plainTextCurrentPassword: string,
     newPassword: UserPassword,
@@ -121,5 +123,5 @@ export class PasswordPolicy {
     }
 
     return Result.success();
-  }
-}
+  },
+};

@@ -8,39 +8,51 @@ import { UserPassword } from './value-objects/user-password.value-object';
 
 /**
  * Interfaz para la creación de un usuario
+ * @interface CreateUserParams
  */
 export interface CreateUserParams {
+  /** Identificador opcional del usuario */
   id?: string;
+  /** Nombre del usuario */
   name: string;
+  /** Email del usuario */
   email: string;
+  /** Contraseña del usuario (texto plano) */
   password: string;
+  /** Estado de activación opcional (por defecto: true) */
   active?: boolean;
 }
 
 /**
  * Interfaz para la reconstitución de un usuario desde persistencia
+ * @interface ReconstitutedUserParams
  */
 export interface ReconstitutedUserParams {
+  /** Identificador del usuario */
   id: string;
+  /** Nombre del usuario */
   name: string;
+  /** Email del usuario */
   email: string;
+  /** Contraseña hasheada del usuario */
   hashedPassword: string;
+  /** Estado de activación */
   active: boolean;
 }
 
 /**
- * Factory para la creación de usuarios.
+ * Factory para la creación de usuarios
+ *
  * Encapsula la lógica de creación de instancias válidas de Usuario y UserAggregate.
+ * @module userFactory
  */
-export class UserFactory {
+export const userFactory = {
   /**
    * Crea un nuevo agregado de usuario a partir de datos primitivos
    * @param params - Parámetros para la creación del usuario
    * @returns Promise con el agregado de usuario creado
    */
-  public static async createAggregate(
-    params: CreateUserParams,
-  ): Promise<UserAggregate> {
+  async createAggregate(params: CreateUserParams): Promise<UserAggregate> {
     // Construir los value objects
     const userId = params.id ? new UserID(params.id) : new UserID();
     const userName = new UserName(params.name);
@@ -62,16 +74,14 @@ export class UserFactory {
 
     // Crear y devolver el agregado
     return new UserAggregate(user);
-  }
+  },
 
   /**
    * Reconstruye un agregado de usuario a partir de datos persistidos
    * @param data - Datos recuperados de la persistencia
    * @returns Agregado de usuario reconstruido
    */
-  public static reconstituteAggregate(
-    data: ReconstitutedUserParams,
-  ): UserAggregate {
+  reconstituteAggregate(data: ReconstitutedUserParams): UserAggregate {
     // Construir los value objects para la reconstitución
     const userId = new UserID(data.id);
     const userName = new UserName(data.name);
@@ -92,5 +102,5 @@ export class UserFactory {
 
     // Crear y devolver el agregado
     return new UserAggregate(user);
-  }
-}
+  },
+};

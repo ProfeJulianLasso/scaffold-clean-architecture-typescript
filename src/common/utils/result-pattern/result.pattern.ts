@@ -33,14 +33,14 @@ export class Result<SuccessValue> {
   /**
    * Verifica si el resultado es exitoso.
    */
-  public isSuccess(): boolean {
+  isSuccess(): boolean {
     return this._isSuccess;
   }
 
   /**
    * Verifica si el resultado es fallido.
    */
-  public isFailure(): boolean {
+  isFailure(): boolean {
     return !this._isSuccess;
   }
 
@@ -48,7 +48,7 @@ export class Result<SuccessValue> {
    * Obtiene el valor del resultado exitoso.
    * @throws Error si se intenta obtener el valor de un resultado fallido
    */
-  public getValue(): SuccessValue {
+  getValue(): SuccessValue {
     if (!this._isSuccess) {
       throw new Error('No se puede obtener el valor de un resultado fallido');
     }
@@ -59,7 +59,7 @@ export class Result<SuccessValue> {
    * Obtiene el error de un resultado fallido.
    * @throws Error si se intenta obtener el error de un resultado exitoso
    */
-  public getError(): ResultException {
+  getError(): ResultException {
     if (this._isSuccess) {
       throw new Error('No se puede obtener el error de un resultado exitoso');
     }
@@ -72,9 +72,7 @@ export class Result<SuccessValue> {
    * @param value - Valor a encapsular en el resultado exitoso
    * @returns Una nueva instancia de Result representando un éxito
    */
-  public static success<SuccessValue>(
-    value?: SuccessValue,
-  ): Result<SuccessValue> {
+  static success<SuccessValue>(value?: SuccessValue): Result<SuccessValue> {
     return new Result<SuccessValue>(true, value);
   }
 
@@ -84,9 +82,7 @@ export class Result<SuccessValue> {
    * @param error - Excepción a encapsular en el resultado fallido
    * @returns Una nueva instancia de Result representando un fallo
    */
-  public static failure<SuccessValue>(
-    error: ResultException,
-  ): Result<SuccessValue> {
+  static failure<SuccessValue>(error: ResultException): Result<SuccessValue> {
     return new Result<SuccessValue>(false, undefined, error);
   }
 
@@ -98,7 +94,7 @@ export class Result<SuccessValue> {
    * @param options - Opciones adicionales para la excepción
    * @returns Una nueva instancia de Result representando un fallo
    */
-  public static fail<SuccessValue>(
+  static fail<SuccessValue>(
     type: ErrorType,
     message: string,
     options?: {
@@ -121,23 +117,26 @@ export class Result<SuccessValue> {
    * @param fn - Función que puede lanzar excepciones
    * @returns Un resultado exitoso o un resultado fallido con la excepción capturada
    */
-  public static try<SuccessValue>(
-    fn: () => SuccessValue,
-  ): Result<SuccessValue> {
+  static try<SuccessValue>(fn: () => SuccessValue): Result<SuccessValue> {
     try {
       return Result.success(fn());
     } catch (error) {
+      // Caso 1: El error ya es una ResultException
       if (error instanceof ResultException) {
         return Result.failure<SuccessValue>(error);
-      } else if (error instanceof Error) {
-        return Result.failure<SuccessValue>(ResultException.fromError(error));
-      } else {
-        return Result.failure<SuccessValue>(
-          new ResultException(ErrorType.INTERNAL, 'Error desconocido', {
-            metadata: { originalError: error },
-          }),
-        );
       }
+
+      // Caso 2: Error estándar de JavaScript
+      if (error instanceof Error) {
+        return Result.failure<SuccessValue>(ResultException.fromError(error));
+      }
+
+      // Caso 3: Cualquier otro tipo de error
+      return Result.failure<SuccessValue>(
+        new ResultException(ErrorType.INTERNAL, 'Error desconocido', {
+          metadata: { originalError: error },
+        }),
+      );
     }
   }
 
@@ -149,7 +148,7 @@ export class Result<SuccessValue> {
    * @param errorTypeMap - Función opcional para determinar el tipo de error según la excepción
    * @returns Una promesa que resuelve a un resultado exitoso o un resultado fallido con la excepción capturada
    */
-  public static async tryAsync<SuccessValue>(
+  static async tryAsync<SuccessValue>(
     fn: () => Promise<SuccessValue>,
     errorTypeMap?: (error: unknown) => ErrorType,
   ): Promise<Result<SuccessValue>> {
@@ -157,64 +156,94 @@ export class Result<SuccessValue> {
       const value = await fn();
       return Result.success(value);
     } catch (error: unknown) {
-      // Si ya es un ResultException, simplemente lo usamos
-      if (error instanceof ResultException) {
-        return Result.failure<SuccessValue>(error);
-      }
+      return Result.handleAsyncError<SuccessValue>(error, errorTypeMap);
+    }
+  }
 
-      // Para errores nativos de JavaScript
-      else if (error instanceof Error) {
-        // Determinar el tipo de error
-        const errorType = errorTypeMap
-          ? errorTypeMap(error)
-          : ErrorType.INTERNAL;
+  /**
+   * Método privado que maneja la transformación de diferentes tipos de errores
+   * en un Result fallido apropiado.
+   */
+  private static handleAsyncError<SuccessValue>(
+    error: unknown,
+    errorTypeMap?: (error: unknown) => ErrorType,
+  ): Result<SuccessValue> {
+    // Caso 1: ResultException
+    if (error instanceof ResultException) {
+      return Result.failure<SuccessValue>(error);
+    }
 
-        // Extraer todas las propiedades no estándar del error
-        const additionalProps: Record<string, unknown> = {};
+    // Caso 2: Error estándar de JavaScript
+    if (error instanceof Error) {
+      return Result.handleStandardError<SuccessValue>(error, errorTypeMap);
+    }
 
-        // Capturar propiedades del objeto Error que no sean parte del estándar
-        Object.getOwnPropertyNames(error).forEach(prop => {
-          if (prop !== 'name' && prop !== 'message' && prop !== 'stack') {
-            // Acceso a propiedades con seguridad de tipos
-            additionalProps[prop] = (
-              error as unknown as Record<string, unknown>
-            )[prop];
-          }
-        });
+    // Caso 3: Cualquier otro tipo de error
+    return Result.handleUnknownError<SuccessValue>(error, errorTypeMap);
+  }
 
-        return Result.failure<SuccessValue>(
-          new ResultException(errorType, error.message, {
-            code: error.name,
-            metadata: {
-              originalError: error,
-              name: error.name,
-              stack: error.stack,
-              errorType: error.constructor.name,
-              ...additionalProps,
-            },
-          }),
-        );
-      }
+  /**
+   * Maneja errores estándar de JavaScript, extrayendo propiedades adicionales
+   */
+  private static handleStandardError<SuccessValue>(
+    error: Error,
+    errorTypeMap?: (error: unknown) => ErrorType,
+  ): Result<SuccessValue> {
+    const errorType = errorTypeMap ? errorTypeMap(error) : ErrorType.INTERNAL;
+    const additionalProps = Result.extractAdditionalProperties(error);
 
-      // Para cualquier otro tipo de error (objetos, strings, etc.)
-      else {
-        const errorType = errorTypeMap
-          ? errorTypeMap(error)
-          : ErrorType.INTERNAL;
+    return Result.failure<SuccessValue>(
+      new ResultException(errorType, error.message, {
+        code: error.name,
+        metadata: {
+          originalError: error,
+          name: error.name,
+          stack: error.stack,
+          errorType: error.constructor.name,
+          ...additionalProps,
+        },
+      }),
+    );
+  }
 
-        const errorMessage =
-          typeof error === 'string' ? error : 'Error desconocido';
+  /**
+   * Extrae propiedades no estándar de un objeto Error
+   */
+  private static extractAdditionalProperties(
+    error: Error,
+  ): Record<string, unknown> {
+    const additionalProps: Record<string, unknown> = {};
 
-        return Result.failure<SuccessValue>(
-          new ResultException(errorType, errorMessage, {
-            metadata: {
-              originalError: error,
-              errorType: typeof error,
-            },
-          }),
-        );
+    for (const prop of Object.getOwnPropertyNames(error)) {
+      if (prop !== 'name' && prop !== 'message' && prop !== 'stack') {
+        additionalProps[prop] = (error as unknown as Record<string, unknown>)[
+          prop
+        ];
       }
     }
+
+    return additionalProps;
+  }
+
+  /**
+   * Maneja errores de tipo desconocido (no Error ni ResultException)
+   */
+  private static handleUnknownError<SuccessValue>(
+    error: unknown,
+    errorTypeMap?: (error: unknown) => ErrorType,
+  ): Result<SuccessValue> {
+    const errorType = errorTypeMap ? errorTypeMap(error) : ErrorType.INTERNAL;
+    const errorMessage =
+      typeof error === 'string' ? error : 'Error desconocido';
+
+    return Result.failure<SuccessValue>(
+      new ResultException(errorType, errorMessage, {
+        metadata: {
+          originalError: error,
+          errorType: typeof error,
+        },
+      }),
+    );
   }
 
   /**
@@ -224,7 +253,7 @@ export class Result<SuccessValue> {
    * @param fn - Función de transformación
    * @returns Un nuevo resultado con el valor transformado o el mismo error
    */
-  public map<MappedValue>(
+  map<MappedValue>(
     fn: (value: SuccessValue) => MappedValue,
   ): Result<MappedValue> {
     if (this.isFailure()) {
@@ -251,7 +280,7 @@ export class Result<SuccessValue> {
    * @param fn - Función que transforma el valor y devuelve un nuevo Result
    * @returns El nuevo Result o el Result fallido original
    */
-  public flatMap<ChainedValue>(
+  flatMap<ChainedValue>(
     fn: (value: SuccessValue) => Result<ChainedValue>,
   ): Result<ChainedValue> {
     if (this.isFailure()) {
@@ -279,7 +308,7 @@ export class Result<SuccessValue> {
    * @param onFailure - Función a ejecutar si el resultado es fallido
    * @returns El valor devuelto por la función correspondiente
    */
-  public fold<FoldedValue>(
+  fold<FoldedValue>(
     onSuccess: (value: SuccessValue) => FoldedValue,
     onFailure: (error: ResultException) => FoldedValue,
   ): FoldedValue {
@@ -294,7 +323,7 @@ export class Result<SuccessValue> {
    * @param fn - Función de recuperación que toma el error y devuelve un nuevo resultado
    * @returns El resultado original si es exitoso, o el resultado de la recuperación
    */
-  public recover(
+  recover(
     fn: (error: ResultException) => Result<SuccessValue>,
   ): Result<SuccessValue> {
     if (this.isSuccess()) {
@@ -321,7 +350,7 @@ export class Result<SuccessValue> {
    * @param action - Acción a ejecutar con el valor del resultado
    * @returns El mismo resultado para permitir encadenamientos
    */
-  public onSuccess(action: (value: SuccessValue) => void): this {
+  onSuccess(action: (value: SuccessValue) => void): this {
     if (this.isSuccess()) {
       try {
         action(this.getValue());
@@ -339,7 +368,7 @@ export class Result<SuccessValue> {
    * @param action - Acción a ejecutar con el error del resultado
    * @returns El mismo resultado para permitir encadenamientos
    */
-  public onFailure(action: (error: ResultException) => void): this {
+  onFailure(action: (error: ResultException) => void): this {
     if (this.isFailure()) {
       try {
         action(this.getError());
@@ -357,7 +386,7 @@ export class Result<SuccessValue> {
    * @returns El valor del resultado exitoso
    * @throws ResultException si el resultado es fallido
    */
-  public unwrap(): SuccessValue {
+  unwrap(): SuccessValue {
     if (this.isFailure()) {
       throw this.getError();
     }
@@ -370,7 +399,7 @@ export class Result<SuccessValue> {
    * @param defaultValue - Valor a devolver si el resultado es fallido
    * @returns El valor del resultado o el valor por defecto
    */
-  public unwrapOr(defaultValue: SuccessValue): SuccessValue {
+  unwrapOr(defaultValue: SuccessValue): SuccessValue {
     return this.isSuccess() ? this.getValue() : defaultValue;
   }
 
@@ -380,9 +409,7 @@ export class Result<SuccessValue> {
    * @param results - Lista de resultados a combinar
    * @returns Un resultado exitoso con array de valores o el primer resultado fallido
    */
-  public static combine<ItemValue>(
-    results: Result<ItemValue>[],
-  ): Result<ItemValue[]> {
+  static combine<ItemValue>(results: Result<ItemValue>[]): Result<ItemValue[]> {
     const values: ItemValue[] = [];
 
     for (const result of results) {

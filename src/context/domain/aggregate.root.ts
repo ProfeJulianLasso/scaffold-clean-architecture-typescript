@@ -1,6 +1,6 @@
 import { Entity } from '@common/entities/entity.abstract';
-import { IDValueObject } from '@common/value-objects/id.value-object.abstract';
-import { IEventPublisher } from './event.publisher.interface';
+import type { IDValueObject } from '@common/value-objects/id.value-object.abstract';
+import type { IEventPublisher } from './event.publisher.interface';
 
 /**
  * Clase abstracta que representa un agregado raíz en el dominio.
@@ -12,9 +12,4 @@ import { IEventPublisher } from './event.publisher.interface';
  */
 export abstract class AggregateRoot<ID extends IDValueObject>
   extends Entity<ID>
-  implements IEventPublisher
-{
-  constructor(id: ID) {
-    super(id);
-  }
-}
+  implements IEventPublisher {}

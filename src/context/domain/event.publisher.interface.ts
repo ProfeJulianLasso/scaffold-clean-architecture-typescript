@@ -1,4 +1,4 @@
-import { DomainEvent } from '@common/domain-events/domain-event.abstract';
+import type { DomainEvent } from '@common/domain-events/domain-event.abstract';
 
 /**
  * Interfaz para objetos de dominio que pueden publicar eventos

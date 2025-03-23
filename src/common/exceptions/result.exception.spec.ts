@@ -1,4 +1,8 @@
-import { ErrorType, IErrorDetails, ResultException } from './result.exception';
+import {
+  ErrorType,
+  type IErrorDetails,
+  ResultException,
+} from './result.exception';
 
 /**
  * Pruebas unitarias para la clase ResultException
@@ -100,7 +104,7 @@ describe('ResultException', () => {
         [ErrorType.INFRASTRUCTURE]: 500,
       };
 
-      errorTypes.forEach(type => {
+      for (const type of errorTypes) {
         // Arrange (Preparar)
         const expectedCode = statusCodeMap[type];
 
@@ -109,7 +113,7 @@ describe('ResultException', () => {
 
         // Assert (Verificar)
         expect(testError.statusCode).toBe(expectedCode);
-      });
+      }
     });
 
     it('debería permitir anular el código de estado predeterminado', () => {
@@ -160,9 +164,9 @@ describe('ResultException', () => {
       const jsonResult: IErrorDetails = exception.toJSON();
 
       // Assert (Verificar)
-      expectedProperties.forEach(prop => {
+      for (const prop of expectedProperties) {
         expect(jsonResult).toHaveProperty(prop);
-      });
+      }
       expect(jsonResult.stack).toBeDefined();
     });
 

@@ -1,4 +1,4 @@
-import { Result } from '@common/utils/result-pattern';
+import type { Result } from '@common/utils/result-pattern';
 
 /**
  * Interfaz de servicio para la gestión de tokens JWT

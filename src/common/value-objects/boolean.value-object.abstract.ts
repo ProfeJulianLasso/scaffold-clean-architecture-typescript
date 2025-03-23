@@ -73,7 +73,7 @@ export abstract class BooleanValueObject extends ValueObject<boolean> {
    * @param value - Valor a convertir
    * @returns Valor convertido a booleano
    */
-  private static convertToBoolean(value: any): boolean {
+  private static convertToBoolean(value: unknown): boolean {
     if (typeof value === 'string') {
       const lowercaseValue = value.toLowerCase().trim();
       return (
@@ -156,13 +156,13 @@ export abstract class BooleanValueObject extends ValueObject<boolean> {
   /**
    * Almacena el valor original antes de procesar
    */
-  private readonly _originalValue: any;
+  private readonly _originalValue: unknown;
 
   /**
    * Obtiene el valor negado (inverso)
    * @returns El valor booleano invertido
    */
-  public get not(): boolean {
+  get not(): boolean {
     return !this.value;
   }
 
@@ -171,7 +171,7 @@ export abstract class BooleanValueObject extends ValueObject<boolean> {
    * @param other - Otro valor booleano o BooleanValueObject para comparar
    * @returns true si los valores son iguales
    */
-  public isEqualTo(other: boolean | BooleanValueObject): boolean {
+  isEqualTo(other: boolean | BooleanValueObject): boolean {
     if (other instanceof BooleanValueObject) {
       return this.value === other.value;
     }

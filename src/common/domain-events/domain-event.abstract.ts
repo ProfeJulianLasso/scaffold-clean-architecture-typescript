@@ -21,21 +21,21 @@ export abstract class DomainEvent {
   /**
    * Identificador único del evento
    */
-  public get eventId(): string {
+  get eventId(): string {
     return this._eventId;
   }
 
   /**
    * Momento en que ocurrió el evento
    */
-  public get occurredOn(): Date {
+  get occurredOn(): Date {
     return this._occurredOn;
   }
 
   /**
    * Nombre del evento
    */
-  public get eventName(): string {
+  get eventName(): string {
     return this._eventName;
   }
 
@@ -43,7 +43,7 @@ export abstract class DomainEvent {
    * Compara si este evento es igual a otro
    * @param other - Otro evento para comparar
    */
-  public equals(other: DomainEvent): boolean {
+  equals(other: DomainEvent): boolean {
     if (other === null || other === undefined) {
       return false;
     }
@@ -59,5 +59,5 @@ export abstract class DomainEvent {
    * Serializa el evento a un objeto plano
    * Las implementaciones deben sobrescribir este método
    */
-  public abstract toPlainObject(): object;
+  abstract toPlainObject(): object;
 }

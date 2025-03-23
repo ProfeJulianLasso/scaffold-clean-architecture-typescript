@@ -13,6 +13,11 @@ export class UserName extends StringValueObject {
   private static readonly NAME_PATTERN = /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s'-]+$/;
 
   /**
+   * Patrón para detectar si un nombre comienza o termina con caracteres especiales
+   */
+  private static readonly SPECIAL_CHAR_BOUNDARY_PATTERN = /(^['-])|(['-]$)/;
+
+  /**
    * Crea una nueva instancia de UserName
    * @param value - String que representa el nombre del usuario
    */
@@ -38,15 +43,15 @@ export class UserName extends StringValueObject {
     if (/\s\s+/.test(value)) {
       this.reportError(
         'El nombre no puede contener múltiples espacios consecutivos',
-        'value',
+        'UserName',
       );
     }
 
     // Verificamos que no comience ni termine con caracteres especiales
-    if (/^['-]|['-]$/.test(value)) {
+    if (UserName.SPECIAL_CHAR_BOUNDARY_PATTERN.test(value)) {
       this.reportError(
         'El nombre no puede comenzar ni terminar con apóstrofes o guiones',
-        'value',
+        'UserName',
       );
     }
   }
@@ -55,7 +60,7 @@ export class UserName extends StringValueObject {
    * Formatea el nombre con la primera letra de cada palabra en mayúscula
    * @returns Nombre formateado
    */
-  public toFormattedName(): string {
+  toFormattedName(): string {
     return this.value
       .split(' ')
       .map(word =>

@@ -1,21 +1,24 @@
 import { ErrorType } from '@common/exceptions';
 import { Result } from '@common/utils/result-pattern';
-import { User } from '../aggregates/users/entities/user.entity';
-import { UserEmail } from '../aggregates/users/value-objects/user-email.value-object';
-import { UserName } from '../aggregates/users/value-objects/user-name.value-object';
+import type { User } from '../aggregates/users/entities/user.entity';
+import type { UserEmail } from '../aggregates/users/value-objects/user-email.value-object';
+import type { UserName } from '../aggregates/users/value-objects/user-name.value-object';
 
 /**
- * Política de dominio para la actualización de usuarios
- * Define reglas de negocio relacionadas con la modificación de datos de usuario
+ * Política de dominio para actualización de usuarios
+ *
+ * Define las reglas de negocio que deben cumplirse para poder
+ * actualizar la información de los usuarios en el sistema.
+ * @module UserUpdatePolicy
  */
-export class UserUpdatePolicy {
+export const userUpdatePolicy = {
   /**
    * Verifica si se puede cambiar el nombre de un usuario
    * @param user - Usuario a modificar
    * @param newName - Nuevo nombre
    * @returns Result con éxito o error
    */
-  public static canChangeName(user: User, newName: UserName): Result<void> {
+  canChangeName(user: User, newName: UserName): Result<void> {
     // Verificar que el usuario esté activo
     if (!user.isActive) {
       return Result.fail(
@@ -41,7 +44,7 @@ export class UserUpdatePolicy {
     }
 
     return Result.success();
-  }
+  },
 
   /**
    * Verifica si se puede cambiar el email de un usuario
@@ -49,7 +52,7 @@ export class UserUpdatePolicy {
    * @param newEmail - Nuevo email
    * @returns Result con éxito o error
    */
-  public static canChangeEmail(user: User, newEmail: UserEmail): Result<void> {
+  canChangeEmail(user: User, newEmail: UserEmail): Result<void> {
     // Verificar que el usuario esté activo
     if (!user.isActive) {
       return Result.fail(
@@ -75,5 +78,5 @@ export class UserUpdatePolicy {
     }
 
     return Result.success();
-  }
-}
+  },
+};

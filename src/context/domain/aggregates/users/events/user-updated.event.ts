@@ -1,22 +1,19 @@
 import { DomainEvent } from '@common/domain-events/domain-event.abstract';
-import { User } from '../entities/user.entity';
+import type { User } from '../entities/user.entity';
 
 /**
  * Evento que se dispara cuando se actualiza un usuario
  */
 export class UserUpdatedEvent extends DomainEvent {
-  private readonly _user: User;
-
-  constructor(user: User) {
+  constructor(private readonly _user: User) {
     super('user.updated');
-    this._user = user;
   }
 
-  public get user(): User {
+  get user(): User {
     return this._user;
   }
 
-  public toPlainObject(): object {
+  toPlainObject(): object {
     return {
       eventId: this.eventId,
       occurredOn: this.occurredOn,

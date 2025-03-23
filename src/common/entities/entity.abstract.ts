@@ -1,5 +1,5 @@
-import { DomainEvent } from '@common/domain-events/domain-event.abstract';
-import { IDValueObject } from '@common/value-objects/id.value-object.abstract';
+import type { DomainEvent } from '@common/domain-events/domain-event.abstract';
+import type { IDValueObject } from '@common/value-objects/id.value-object.abstract';
 
 /**
  * Clase abstracta que representa una entidad en el dominio.
@@ -22,7 +22,7 @@ export abstract class Entity<ID extends IDValueObject> {
   /**
    * Obtiene el identificador único de la entidad
    */
-  public get id(): ID {
+  get id(): ID {
     return this._id;
   }
 
@@ -31,7 +31,7 @@ export abstract class Entity<ID extends IDValueObject> {
    * @param other - Otra entidad para comparar
    * @returns true si son la misma entidad (mismo ID), false en caso contrario
    */
-  public equals(other?: Entity<ID>): boolean {
+  equals(other?: Entity<ID>): boolean {
     if (other === null || other === undefined) {
       return false;
     }
@@ -59,9 +59,8 @@ export abstract class Entity<ID extends IDValueObject> {
    * Elimina un evento de dominio de la lista
    * @param domainEvent - Evento de dominio a eliminar
    */
-  public removeDomainEvent(domainEvent: DomainEvent): void {
+  removeDomainEvent(domainEvent: DomainEvent): void {
     const index = this._domainEvents.findIndex(event =>
-      // eslint-disable-next-line no-unused-vars
       (event as unknown as { equals(other: DomainEvent): boolean }).equals(
         domainEvent,
       ),
@@ -75,14 +74,14 @@ export abstract class Entity<ID extends IDValueObject> {
    * Obtiene todos los eventos de dominio pendientes
    * @returns Array de eventos de dominio
    */
-  public getDomainEvents(): DomainEvent[] {
+  getDomainEvents(): DomainEvent[] {
     return this._domainEvents.slice();
   }
 
   /**
    * Limpia todos los eventos de dominio pendientes
    */
-  public clearEvents(): void {
+  clearEvents(): void {
     this._domainEvents = [];
   }
 
@@ -90,7 +89,7 @@ export abstract class Entity<ID extends IDValueObject> {
    * Convierte la entidad a un objeto plano para serialización
    * Las implementaciones pueden sobrescribir este método para personalizar la serialización
    */
-  public toJSON(): object {
+  toJSON(): object {
     return {
       id: this._id.value,
     };

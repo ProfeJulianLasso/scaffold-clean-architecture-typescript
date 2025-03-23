@@ -150,7 +150,7 @@ export abstract class ValueObject<ValueType> extends ValidationHandler {
    *
    * @throws {ResultException} Si el value object no es válido
    */
-  public ensureValid(): void {
+  ensureValid(): void {
     this.throwIfHasErrors(this._objectName);
   }
 }

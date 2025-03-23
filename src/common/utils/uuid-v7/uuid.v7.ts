@@ -31,7 +31,7 @@ export class UUIDv7 {
    * Genera un nuevo UUIDv7 usando el timestamp actual
    * @returns Una nueva instancia de UUIDv7
    */
-  public static generate(): UUIDv7 {
+  static generate(): UUIDv7 {
     const timestamp = Date.now();
     return UUIDv7._fromTimestamp(timestamp);
   }
@@ -42,7 +42,7 @@ export class UUIDv7 {
    * @returns {UUIDv7} Una nueva instancia de UUIDv7 con el timestamp indicado
    * @throws {Error} Si el timestamp no es un entero no negativo
    */
-  public static fromTimestamp(timestamp: number): UUIDv7 {
+  static fromTimestamp(timestamp: number): UUIDv7 {
     if (!Number.isInteger(timestamp) || timestamp < 0) {
       throw new ResultException(
         ErrorType.VALIDATION,
@@ -72,13 +72,13 @@ export class UUIDv7 {
     const timeMid = timestampHex.substring(8, 12);
 
     // Para la primera parte de time_hi_and_version, tomamos los bits restantes y establecemos versión 7
-    const timeHi = '7' + this._randomHex(3);
+    const timeHi = `7${UUIDv7._randomHex(3)}`;
 
     // Para la parte de variante, aseguramos que comience con 8, 9, a, o b (10xx en binario)
-    const variantAndRandom = this._getVariantChar() + this._randomHex(3);
+    const variantAndRandom = UUIDv7._getVariantChar() + UUIDv7._randomHex(3);
 
     // Generamos la parte final random
-    const random = this._randomHex(12);
+    const random = UUIDv7._randomHex(12);
 
     // Formamos el UUID según el formato estándar
     const uuid = `${timeLow}-${timeMid}-${timeHi}-${variantAndRandom}-${random}`;
@@ -92,7 +92,7 @@ export class UUIDv7 {
    * @returns {UUIDv7} Instancia de UUIDv7
    * @throws {Error} Si el formato no es válido o no es un UUIDv7
    */
-  public static parse(uuidString: string): UUIDv7 {
+  static parse(uuidString: string): UUIDv7 {
     if (!UUIDv7.isValid(uuidString)) {
       throw new ResultException(
         ErrorType.VALIDATION,
@@ -112,7 +112,7 @@ export class UUIDv7 {
 
     // Reconstruir el timestamp en hexadecimal y convertirlo a número
     const timestampHex = timeLow + timeMid;
-    const timestamp = parseInt(timestampHex, 16);
+    const timestamp = Number.parseInt(timestampHex, 16);
 
     return new UUIDv7(uuidString.toLowerCase(), timestamp);
   }
@@ -122,8 +122,8 @@ export class UUIDv7 {
    * @param uuidString - String a validar
    * @returns true si es un UUIDv7 válido, false en caso contrario
    */
-  public static isValid(uuidString: string): boolean {
-    return this._REGEX_VALIDATE.test(uuidString);
+  static isValid(uuidString: string): boolean {
+    return UUIDv7._REGEX_VALIDATE.test(uuidString);
   }
 
   /**
@@ -156,8 +156,8 @@ export class UUIDv7 {
 
     // Convertimos a hexadecimal y tomamos la longitud pedida
     let result = '';
-    for (let i = 0; i < bytes.length; i++) {
-      result += bytes[i].toString(16).padStart(2, '0');
+    for (const byte of bytes) {
+      result += byte.toString(16).padStart(2, '0');
     }
 
     return result.substring(0, length);
@@ -168,7 +168,7 @@ export class UUIDv7 {
    * @param other - Otro UUID para comparar
    * @returns Número negativo si este UUID es menor, positivo si es mayor, 0 si son iguales
    */
-  public compareTo(other: UUIDv7): number {
+  compareTo(other: UUIDv7): number {
     // Primero comparamos por timestamp
     if (this._timestamp !== other._timestamp) {
       return this._timestamp - other._timestamp;
@@ -182,7 +182,7 @@ export class UUIDv7 {
    * Devuelve el timestamp extraído del UUID
    * @returns Timestamp en milisegundos
    */
-  public getTimestamp(): number {
+  getTimestamp(): number {
     return this._timestamp;
   }
 
@@ -190,7 +190,7 @@ export class UUIDv7 {
    * Devuelve la fecha generada a partir del timestamp
    * @returns Objeto Date
    */
-  public getDate(): Date {
+  getDate(): Date {
     return new Date(this._timestamp);
   }
 
@@ -198,7 +198,7 @@ export class UUIDv7 {
    * Convierte el UUID a representación de string
    * @returns Representación string del UUID
    */
-  public toString(): string {
+  toString(): string {
     return this._value;
   }
 
@@ -206,7 +206,7 @@ export class UUIDv7 {
    * Devuelve la representación JSON del UUID (su valor string)
    * @returns Valor string del UUID
    */
-  public toJSON(): string {
+  toJSON(): string {
     return this._value;
   }
 
@@ -215,7 +215,7 @@ export class UUIDv7 {
    * @param other - Otro objeto para comparar
    * @returns true si son iguales, false en caso contrario
    */
-  public equals(other: unknown): boolean {
+  equals(other: unknown): boolean {
     if (!(other instanceof UUIDv7)) {
       return false;
     }

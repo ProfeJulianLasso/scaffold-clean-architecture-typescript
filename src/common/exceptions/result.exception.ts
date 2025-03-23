@@ -136,7 +136,7 @@ export class ResultException extends Error {
    *
    * @returns Detalles del error en formato JSON
    */
-  public toJSON(): IErrorDetails {
+  toJSON(): IErrorDetails {
     return {
       ...this.details,
       stack: process.env.NODE_ENV === 'production' ? undefined : this.stack,
@@ -152,7 +152,7 @@ export class ResultException extends Error {
    * @returns Una instancia de ResultException
    * @static
    */
-  public static fromError(
+  static fromError(
     error: Error,
     type: ErrorType = ErrorType.INTERNAL,
   ): ResultException {

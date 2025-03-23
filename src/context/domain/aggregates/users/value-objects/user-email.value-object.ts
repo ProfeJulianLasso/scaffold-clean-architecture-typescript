@@ -48,7 +48,7 @@ export class UserEmail extends StringValueObject {
    * Devuelve la parte local del correo electrónico (antes del @)
    * @returns Parte local del correo
    */
-  public getLocalPart(): string {
+  getLocalPart(): string {
     return this.value.split('@')[0];
   }
 
@@ -56,7 +56,7 @@ export class UserEmail extends StringValueObject {
    * Devuelve el dominio del correo electrónico (después del @)
    * @returns Dominio del correo
    */
-  public getDomain(): string {
+  getDomain(): string {
     const parts = this.value.split('@');
     return parts.length > 1 ? parts[1] : '';
   }
@@ -65,7 +65,7 @@ export class UserEmail extends StringValueObject {
    * Normaliza el correo electrónico a minúsculas
    * @returns Correo normalizado
    */
-  public normalize(): string {
+  normalize(): string {
     return this.value.toLowerCase();
   }
 }

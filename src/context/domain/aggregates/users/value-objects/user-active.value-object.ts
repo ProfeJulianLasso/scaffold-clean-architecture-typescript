@@ -21,7 +21,6 @@ export class UserActive extends BooleanValueObject {
    * Validaciones adicionales específicas para el estado activo
    * En este caso simple no necesitamos validaciones adicionales
    */
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
   protected validateBoolean(value: boolean): void {
     // No se requieren validaciones adicionales
   }
@@ -30,7 +29,7 @@ export class UserActive extends BooleanValueObject {
    * Activa el usuario
    * @returns Nueva instancia con el usuario activo
    */
-  public activate(): UserActive {
+  activate(): UserActive {
     if (this.value) return this; // Ya está activo
     return new UserActive(true);
   }
@@ -39,7 +38,7 @@ export class UserActive extends BooleanValueObject {
    * Desactiva el usuario
    * @returns Nueva instancia con el usuario inactivo
    */
-  public deactivate(): UserActive {
+  deactivate(): UserActive {
     if (!this.value) return this; // Ya está inactivo
     return new UserActive(false);
   }
@@ -47,7 +46,7 @@ export class UserActive extends BooleanValueObject {
   /**
    * Mensaje descriptivo según el estado
    */
-  public getStatusMessage(): string {
+  getStatusMessage(): string {
     return this.value ? 'Usuario activo' : 'Usuario inactivo';
   }
 }

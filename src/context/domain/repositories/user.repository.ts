@@ -1,8 +1,7 @@
-/* eslint-disable no-unused-vars */
-import { Result } from '@common/utils/result-pattern';
-import { UserAggregate } from '../aggregates/users/user.aggregate';
-import { UserEmail } from '../aggregates/users/value-objects/user-email.value-object';
-import { UserID } from '../aggregates/users/value-objects/user-id.value-object';
+import type { Result } from '@common/utils/result-pattern';
+import type { UserAggregate } from '../aggregates/users/user.aggregate';
+import type { UserEmail } from '../aggregates/users/value-objects/user-email.value-object';
+import type { UserID } from '../aggregates/users/value-objects/user-id.value-object';
 
 /**
  * Interfaz de repositorio para el agregado de Usuario
