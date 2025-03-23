@@ -671,6 +671,28 @@ const realWorldExamples = {
       }
     }
 
+    // Define interfaces claras para los dos tipos de respuesta
+    interface ApiSuccessResponse {
+      statusCode: number;
+      body: {
+        status: 'success';
+        data: User;
+      };
+    }
+
+    interface ApiErrorResponse {
+      statusCode: number;
+      body: {
+        status: 'error';
+        error: {
+          code: string;
+          message: string;
+        };
+      };
+    }
+
+    type ApiResponse = ApiSuccessResponse | ApiErrorResponse;
+
     // Simulación de un controlador HTTP
     class UserController {
       constructor(private readonly _userService: UserService) {}
@@ -678,14 +700,17 @@ const realWorldExamples = {
       /**
        * Maneja la petición para obtener un usuario
        */
-      getUser(userId: string): object {
+      getUser(userId: string): ApiResponse {
         const result = this._userService.findById(userId);
 
-        return result.fold(
+        return result.fold<ApiResponse>(
           // Caso exitoso: devolver respuesta 200 con datos
           user => ({
             statusCode: 200,
-            body: { status: 'success', data: user },
+            body: {
+              status: 'success',
+              data: user,
+            },
           }),
           // Caso fallido: devolver código de error adecuado
           error => ({
@@ -704,7 +729,7 @@ const realWorldExamples = {
       /**
        * Maneja la petición para crear un usuario
        */
-      createUser(userData: { name: string; email: string }): object {
+      createUser(userData: { name: string; email: string }): ApiResponse {
         // Validación simple
         const validationResult = this.validateUserData(userData);
 
@@ -725,7 +750,7 @@ const realWorldExamples = {
         // Crear usuario
         const result = this._userService.createUser(userData);
 
-        return result.fold(
+        return result.fold<ApiResponse>(
           // Caso exitoso: respuesta 201 Created
           user => ({
             statusCode: 201,
@@ -1050,14 +1075,36 @@ const bestPractices = {
       }
     }
 
+    // Define interfaces claras para los dos tipos de respuesta
+    interface ApiSuccessResponse {
+      statusCode: number;
+      body: {
+        status: 'success';
+        token: string;
+      };
+    }
+
+    interface ApiErrorResponse {
+      statusCode: number;
+      body: {
+        status: 'error';
+        error: {
+          code: string;
+          message: string;
+        };
+      };
+    }
+
+    type ApiResponse = ApiSuccessResponse | ApiErrorResponse;
+
     // 3. Capa de Controlador (manejo de peticiones)
     class AuthController {
       constructor(private readonly _authService: AuthService) {}
 
-      handleLogin(request: { email: string; password: string }): object {
+      handleLogin(request: { email: string; password: string }): ApiResponse {
         const result = this._authService.login(request.email, request.password);
 
-        return result.fold(
+        return result.fold<ApiResponse>(
           // Respuesta exitosa
           token => ({
             statusCode: 200,
