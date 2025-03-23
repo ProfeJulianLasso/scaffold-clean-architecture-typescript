@@ -10,10 +10,10 @@ export class LoginDTOResponse {
    * @param name - Nombre del usuario (opcional, solo en caso de éxito)
    */
   constructor(
-    public readonly success: boolean,
-    public readonly message: string,
-    public readonly token?: string,
-    public readonly userId?: string,
-    public readonly name?: string,
+    readonly success: boolean,
+    readonly message: string,
+    readonly token?: string,
+    readonly userId?: string,
+    readonly name?: string,
   ) {}
 }

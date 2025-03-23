@@ -8,8 +8,8 @@ export class RegisterUserDTORequest {
    * @param password - Contraseña en texto plano
    */
   constructor(
-    public readonly name: string,
-    public readonly email: string,
-    public readonly password: string,
+    readonly name: string,
+    readonly email: string,
+    readonly password: string,
   ) {}
 }

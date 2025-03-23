@@ -1,6 +1,6 @@
-import { Result } from '@common/utils';
-import { LoginDTORequest } from '../../dtos/requests/login.dto.request';
-import { LoginDTOResponse } from '../../dtos/responses/login.dto.response';
+import type { Result } from '@common/utils';
+import type { LoginDTORequest } from '../../dtos/requests/login.dto.request';
+import type { LoginDTOResponse } from '../../dtos/responses/login.dto.response';
 
 /**
  * Interfaz para el comando de inicio de sesión

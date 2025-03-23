@@ -1,7 +1,7 @@
-import { Result } from '@common/utils/result-pattern';
-import { IUserRepository } from '../../../domain/repositories/user.repository';
-import { RegisterUserDTORequest } from '../../dtos/requests/register-user.dto.request';
-import { RegisterUserDTOResponse } from '../../dtos/responses/register-user.dto.response';
+import type { Result } from '@common/utils/result-pattern';
+import type { IUserRepository } from '../../../domain/repositories/user.repository';
+import type { RegisterUserDTORequest } from '../../dtos/requests/register-user.dto.request';
+import type { RegisterUserDTOResponse } from '../../dtos/responses/register-user.dto.response';
 import { RegisterUserCommand } from '../implementations/register-user.command';
 
 /**
@@ -22,7 +22,7 @@ export class RegisterUserHandler {
    * @param request - DTO con los datos de solicitud
    * @returns Promise con el resultado de la operación
    */
-  public async handle(
+  async handle(
     request: RegisterUserDTORequest,
   ): Promise<Result<RegisterUserDTOResponse>> {
     return this._registerUserCommand.execute(request);

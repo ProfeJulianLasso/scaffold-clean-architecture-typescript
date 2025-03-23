@@ -8,8 +8,8 @@ export class RegisterUserDTOResponse {
    * @param userId - ID del usuario creado (opcional, solo en caso de éxito)
    */
   constructor(
-    public readonly success: boolean,
-    public readonly message: string,
-    public readonly userId?: string,
+    readonly success: boolean,
+    readonly message: string,
+    readonly userId?: string,
   ) {}
 }

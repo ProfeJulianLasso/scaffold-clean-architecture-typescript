@@ -1,12 +1,12 @@
-import { Result } from '@common/utils/result-pattern';
-import { IUserRepository } from '../../domain/repositories/user.repository';
-import { ITokenService } from '../../domain/services/token.service';
+import type { Result } from '@common/utils/result-pattern';
+import type { IUserRepository } from '../../domain/repositories/user.repository';
+import type { ITokenService } from '../../domain/services/token.service';
 import { LoginHandler } from '../commands/handlers/login.handler';
 import { RegisterUserHandler } from '../commands/handlers/register-user.handler';
-import { LoginDTORequest } from '../dtos/requests/login.dto.request';
-import { RegisterUserDTORequest } from '../dtos/requests/register-user.dto.request';
-import { LoginDTOResponse } from '../dtos/responses/login.dto.response';
-import { RegisterUserDTOResponse } from '../dtos/responses/register-user.dto.response';
+import type { LoginDTORequest } from '../dtos/requests/login.dto.request';
+import type { RegisterUserDTORequest } from '../dtos/requests/register-user.dto.request';
+import type { LoginDTOResponse } from '../dtos/responses/login.dto.response';
+import type { RegisterUserDTOResponse } from '../dtos/responses/register-user.dto.response';
 
 /**
  * Servicio de aplicación para operaciones relacionadas con usuarios
@@ -33,7 +33,7 @@ export class UserService {
    * @param request - DTO con los datos de solicitud
    * @returns Promise con el resultado de la operación
    */
-  public async register(
+  async register(
     request: RegisterUserDTORequest,
   ): Promise<Result<RegisterUserDTOResponse>> {
     return this._registerUserHandler.handle(request);
@@ -44,7 +44,7 @@ export class UserService {
    * @param request - DTO con los datos de solicitud
    * @returns Promise con el resultado de la operación
    */
-  public async login(
+  async login(
     request: LoginDTORequest,
   ): Promise<Result<LoginDTOResponse>> {
     return this._loginHandler.handle(request);

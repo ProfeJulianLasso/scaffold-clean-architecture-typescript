@@ -7,7 +7,7 @@ export class LoginDTORequest {
    * @param password - Contraseña en texto plano
    */
   constructor(
-    public readonly email: string,
-    public readonly password: string,
+    readonly email: string,
+    readonly password: string,
   ) {}
 }

@@ -4,12 +4,12 @@
     "markis.code-coverage",
     "mikestead.dotenv",
     "editorconfig.editorconfig",
-    "dbaeumer.vscode-eslint",
     "usernamehw.errorlens",
     "sonarsource.sonarlint-vscode",
     "sidp.strict-whitespace",
     "streetsidesoftware.code-spell-checker",
     "streetsidesoftware.code-spell-checker-spanish",
     "kisstkondoros.vscode-codemetrics",
+    "biomejs.biome",
   ]
 }
