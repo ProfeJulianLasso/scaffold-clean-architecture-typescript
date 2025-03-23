@@ -1,3 +1,4 @@
+import { Result } from '@common/utils/result-pattern';
 import { AggregateRoot } from '../../aggregate.root';
 import { User } from './entities/user.entity';
 import { UserEmail } from './value-objects/user-email.value-object';
@@ -33,48 +34,61 @@ export class UserAggregate extends AggregateRoot<UserID> {
   /**
    * Cambia el nombre del usuario
    * @param name - Nuevo nombre del usuario
+   * @returns Result con éxito o error
    */
-  public changeName(name: UserName): void {
-    this._user.changeName(name);
+  public changeName(name: UserName): Result<void> {
+    // Aplicamos la operación en la entidad
+    const result = this._user.changeName(name);
 
-    // Transferimos los eventos generados por la operación
-    this._user.getDomainEvents().forEach(event => {
-      this.addDomainEvent(event);
-    });
-    this._user.clearEvents();
+    // Si fue exitoso, transferimos los eventos generados
+    if (result.isSuccess()) {
+      this._user.getDomainEvents().forEach(event => {
+        this.addDomainEvent(event);
+      });
+      this._user.clearEvents();
+    }
+
+    return result;
   }
 
   /**
    * Cambia el email del usuario
    * @param email - Nuevo email del usuario
+   * @returns Result con éxito o error
    */
-  public changeEmail(email: UserEmail): void {
-    this._user.changeEmail(email);
+  public changeEmail(email: UserEmail): Result<void> {
+    // Aplicamos la operación en la entidad
+    const result = this._user.changeEmail(email);
 
-    // Transferimos los eventos generados por la operación
-    this._user.getDomainEvents().forEach(event => {
-      this.addDomainEvent(event);
-    });
-    this._user.clearEvents();
+    // Si fue exitoso, transferimos los eventos generados
+    if (result.isSuccess()) {
+      this._user.getDomainEvents().forEach(event => {
+        this.addDomainEvent(event);
+      });
+      this._user.clearEvents();
+    }
+
+    return result;
   }
 
   /**
    * Cambia la contraseña del usuario
    * @param currentPassword - Contraseña actual en texto plano
    * @param newPassword - Nueva contraseña
-   * @returns Promise<boolean> - true si el cambio fue exitoso
+   * @returns Promise<Result<void>> - Result con éxito o error
    */
   public async changePassword(
     currentPassword: string,
     newPassword: UserPassword,
-  ): Promise<boolean> {
+  ): Promise<Result<void>> {
+    // Aplicamos la operación en la entidad
     const result = await this._user.changePassword(
       currentPassword,
       newPassword,
     );
 
-    if (result) {
-      // Transferimos los eventos generados por la operación
+    // Si fue exitoso, transferimos los eventos generados
+    if (result.isSuccess()) {
       this._user.getDomainEvents().forEach(event => {
         this.addDomainEvent(event);
       });
@@ -100,28 +114,40 @@ export class UserAggregate extends AggregateRoot<UserID> {
 
   /**
    * Activa el usuario
+   * @returns Result con éxito o error
    */
-  public activate(): void {
-    this._user.activate();
+  public activate(): Result<void> {
+    // Aplicamos la operación en la entidad
+    const result = this._user.activate();
 
-    // Transferimos los eventos generados por la operación
-    this._user.getDomainEvents().forEach(event => {
-      this.addDomainEvent(event);
-    });
-    this._user.clearEvents();
+    // Si fue exitoso, transferimos los eventos generados
+    if (result.isSuccess()) {
+      this._user.getDomainEvents().forEach(event => {
+        this.addDomainEvent(event);
+      });
+      this._user.clearEvents();
+    }
+
+    return result;
   }
 
   /**
    * Desactiva el usuario
+   * @returns Result con éxito o error
    */
-  public deactivate(): void {
-    this._user.deactivate();
+  public deactivate(): Result<void> {
+    // Aplicamos la operación en la entidad
+    const result = this._user.deactivate();
 
-    // Transferimos los eventos generados por la operación
-    this._user.getDomainEvents().forEach(event => {
-      this.addDomainEvent(event);
-    });
-    this._user.clearEvents();
+    // Si fue exitoso, transferimos los eventos generados
+    if (result.isSuccess()) {
+      this._user.getDomainEvents().forEach(event => {
+        this.addDomainEvent(event);
+      });
+      this._user.clearEvents();
+    }
+
+    return result;
   }
 
   /**

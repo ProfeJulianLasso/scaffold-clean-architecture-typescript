@@ -1,6 +1,7 @@
-/* eslint-disable no-useless-escape */
+import { ErrorType, ResultException } from '@common/exceptions';
 import { StringValueObject } from '@common/value-objects';
 import * as bcrypt from 'bcrypt';
+import { PasswordPolicy } from '../../../policies/password.policy';
 
 /**
  * Opciones para la creación de una contraseña
@@ -16,15 +17,6 @@ export interface UserPasswordOptions {
  * Value Object que representa la contraseña de un usuario
  */
 export class UserPassword extends StringValueObject {
-  /**
-   * Patrones para validar los requisitos de seguridad
-   */
-  private static readonly UPPERCASE_PATTERN = /[A-Z]/;
-  private static readonly LOWERCASE_PATTERN = /[a-z]/;
-  private static readonly NUMBER_PATTERN = /[0-9]/;
-  private static readonly SPECIAL_CHAR_PATTERN =
-    /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
-
   /**
    * Indica si la contraseña proporcionada ya estaba hasheada
    */
@@ -58,49 +50,25 @@ export class UserPassword extends StringValueObject {
    * @param value - Valor a validar
    */
   protected validateString(value: string): void {
-    // Si ya está hasheada, no validamos los requisitos de seguridad
+    // Si ya está hasheada, solo validamos el formato del hash
     if (this.isHashed) {
       // Verificamos que parezca un hash de bcrypt (comienza con $2b$)
       if (!value.startsWith('$2b$')) {
         this.reportError(
           'El hash de la contraseña no tiene el formato esperado',
-          'value',
+          'UserPassword',
         );
       }
       return;
     }
 
-    // Validaciones de requisitos de seguridad para contraseña en texto plano
-    if (/\s/.test(value)) {
-      this.reportError('La contraseña no puede contener espacios', 'value');
-    }
+    // Si no está hasheada, aplicamos la política de seguridad
+    const securityResult = PasswordPolicy.validateSecurity(value);
 
-    if (!UserPassword.UPPERCASE_PATTERN.test(value)) {
-      this.reportError(
-        'La contraseña debe contener al menos una letra mayúscula',
-        'value',
-      );
-    }
-
-    if (!UserPassword.LOWERCASE_PATTERN.test(value)) {
-      this.reportError(
-        'La contraseña debe contener al menos una letra minúscula',
-        'value',
-      );
-    }
-
-    if (!UserPassword.NUMBER_PATTERN.test(value)) {
-      this.reportError(
-        'La contraseña debe contener al menos un número',
-        'value',
-      );
-    }
-
-    if (!UserPassword.SPECIAL_CHAR_PATTERN.test(value)) {
-      this.reportError(
-        'La contraseña debe contener al menos un carácter especial',
-        'value',
-      );
+    if (securityResult.isFailure()) {
+      this.reportError(securityResult.getError().message, 'UserPassword', {
+        policyError: securityResult.getError().details,
+      });
     }
   }
 
@@ -129,8 +97,20 @@ export class UserPassword extends StringValueObject {
   public async compare(plainTextPassword: string): Promise<boolean> {
     // Si esta instancia no está hasheada, no podemos comparar
     if (!this.isHashed) {
-      throw new Error(
+      throw new ResultException(
+        ErrorType.DOMAIN,
         'No se puede comparar con una contraseña que no está hasheada',
+        {
+          code: 'PASSWORD_NOT_HASHED',
+          source: 'UserPassword.compare',
+          statusCode: 400,
+          isOperational: true,
+          metadata: {
+            password: this.value,
+            plainTextPassword,
+          },
+          stack: new Error().stack,
+        },
       );
     }
 

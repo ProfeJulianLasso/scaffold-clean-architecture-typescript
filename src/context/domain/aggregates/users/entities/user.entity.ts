@@ -1,4 +1,8 @@
 import { Entity } from '@common/entities/entity.abstract';
+import { Result } from '@common/utils/result-pattern';
+import { PasswordPolicy } from '../../../policies/password.policy';
+import { UserActivationPolicy } from '../../../policies/user-activation.policy';
+import { UserUpdatePolicy } from '../../../policies/user-update.policy';
 import { UserCreatedEvent } from '../events/user-created.event';
 import { UserUpdatedEvent } from '../events/user-updated.event';
 import { UserActive } from '../value-objects/user-active.value-object';
@@ -70,43 +74,63 @@ export class User extends Entity<UserID> {
   /**
    * Cambia el nombre del usuario
    * @param newName - Nuevo nombre
+   * @returns Result con éxito o error
    */
-  public changeName(newName: UserName): void {
+  public changeName(newName: UserName): Result<void> {
+    // Aplicar política de cambio de nombre
+    const policyResult = UserUpdatePolicy.canChangeName(this, newName);
+    if (policyResult.isFailure()) {
+      return policyResult;
+    }
+
     this._name = newName;
     this.registerUpdateEvent();
+    return Result.success();
   }
 
   /**
    * Cambia el email del usuario
    * @param newEmail - Nuevo email
+   * @returns Result con éxito o error
    */
-  public changeEmail(newEmail: UserEmail): void {
+  public changeEmail(newEmail: UserEmail): Result<void> {
+    // Aplicar política de cambio de email
+    const policyResult = UserUpdatePolicy.canChangeEmail(this, newEmail);
+    if (policyResult.isFailure()) {
+      return policyResult;
+    }
+
     this._email = newEmail;
     this.registerUpdateEvent();
+    return Result.success();
   }
 
   /**
    * Cambia la contraseña del usuario
    * @param currentPassword - Contraseña actual en texto plano
    * @param newPassword - Nueva contraseña en texto plano
-   * @returns Promise<boolean> - true si el cambio fue exitoso
+   * @returns Promise<Result> - Result con éxito o error
    */
   public async changePassword(
     currentPassword: string,
     newPassword: UserPassword,
-  ): Promise<boolean> {
-    // Verificar la contraseña actual
-    const isValid = await this._password.compare(currentPassword);
+  ): Promise<Result<void>> {
+    // Aplicar política de cambio de contraseña
+    const policyResult = await PasswordPolicy.canChangePassword(
+      this._password,
+      currentPassword,
+      newPassword,
+    );
 
-    if (!isValid) {
-      return false;
+    if (policyResult.isFailure()) {
+      return policyResult;
     }
 
     // Hashear y establecer la nueva contraseña
     this._password = await newPassword.hash();
 
     this.registerUpdateEvent();
-    return true;
+    return Result.success();
   }
 
   /**
@@ -121,22 +145,34 @@ export class User extends Entity<UserID> {
 
   /**
    * Activa el usuario
+   * @returns Result con éxito o error
    */
-  public activate(): void {
-    if (this._active.value) return; // Ya está activo
+  public activate(): Result<void> {
+    // Aplicar política de activación
+    const policyResult = UserActivationPolicy.canActivate(this);
+    if (policyResult.isFailure()) {
+      return policyResult;
+    }
 
     this._active = this._active.activate();
     this.registerUpdateEvent();
+    return Result.success();
   }
 
   /**
    * Desactiva el usuario
+   * @returns Result con éxito o error
    */
-  public deactivate(): void {
-    if (!this._active.value) return; // Ya está inactivo
+  public deactivate(): Result<void> {
+    // Aplicar política de desactivación
+    const policyResult = UserActivationPolicy.canDeactivate(this);
+    if (policyResult.isFailure()) {
+      return policyResult;
+    }
 
     this._active = this._active.deactivate();
     this.registerUpdateEvent();
+    return Result.success();
   }
 
   /**

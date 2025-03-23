@@ -4,8 +4,9 @@ import { IEventPublisher } from './event.publisher.interface';
 
 /**
  * Clase abstracta que representa un agregado raíz en el dominio.
- * Un agregado raíz es responsable de mantener la consistencia de todo el agregado
- * y es la única entidad a la que se puede acceder desde fuera del agregado.
+ * Un agregado raíz es responsable de mantener la consistencia en cada parte
+ * del agregado y es la única entidad a la que se puede acceder desde fuera
+ * del agregado.
  *
  * @type ID - Tipo de identificador que extiende de IDValueObject
  */
