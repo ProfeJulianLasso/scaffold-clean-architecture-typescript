@@ -1,4 +1,7 @@
-import { ErrorType, ResultException } from '@common/exceptions';
+import {
+  ErrorType,
+  ResultException,
+} from '@common/exceptions/result.exception';
 
 /**
  * Representa un error específico de validación

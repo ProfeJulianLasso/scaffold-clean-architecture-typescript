@@ -1,7 +1,7 @@
-import type { ICommand } from '@common';
-import { ErrorType } from '@common/exceptions';
-import { Result } from '@common/utils/result-pattern';
-import { UserEmail } from '@domain';
+import type { ICommand } from '@common/application-commands/command.interface';
+import { ErrorType } from '@common/exceptions/result.exception';
+import { Result } from '@common/utils/result-pattern/result.pattern';
+import { UserEmail } from '@domain/aggregates/users/value-objects/user-email.value-object';
 import type { IUserRepository } from '../../../domain/repositories/user.repository';
 import type { ITokenService } from '../../../domain/services/token.service';
 import type { LoginDTORequest } from '../../dtos/requests/login.dto.request';
@@ -89,8 +89,6 @@ export class LoginCommand
           true,
           'Inicio de sesión exitoso',
           tokenResult.getValue(),
-          userAggregate.id.value,
-          userAggregate.user.name.value,
         ),
       );
     } catch (error) {

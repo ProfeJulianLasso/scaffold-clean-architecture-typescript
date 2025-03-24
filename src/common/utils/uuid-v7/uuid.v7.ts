@@ -8,7 +8,10 @@
  * - Componente aleatorio
  */
 
-import { ErrorType, ResultException } from '@common/exceptions';
+import {
+  ErrorType,
+  ResultException,
+} from '@common/exceptions/result.exception';
 
 export class UUIDv7 {
   private static readonly _REGEX_VALIDATE: RegExp =

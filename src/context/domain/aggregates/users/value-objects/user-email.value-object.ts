@@ -1,4 +1,4 @@
-import { StringValueObject } from '@common/value-objects';
+import { StringValueObject } from '@common/value-objects/string.value-object.abstract';
 
 /**
  * Value Object que representa el correo electrónico de un usuario

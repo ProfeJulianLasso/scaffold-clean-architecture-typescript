@@ -1,4 +1,4 @@
-import type { Result } from '@common/utils/result-pattern';
+import type { Result } from '@common/utils/result-pattern/result.pattern';
 import type { UserAggregate } from '../aggregates/users/user.aggregate';
 import type { UserEmail } from '../aggregates/users/value-objects/user-email.value-object';
 import type { UserID } from '../aggregates/users/value-objects/user-id.value-object';

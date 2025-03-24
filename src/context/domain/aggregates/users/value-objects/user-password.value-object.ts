@@ -1,7 +1,10 @@
-import { ErrorType, ResultException } from '@common/exceptions';
-import { StringValueObject } from '@common/value-objects';
+import {
+  ErrorType,
+  ResultException,
+} from '@common/exceptions/result.exception';
+import { StringValueObject } from '@common/value-objects/string.value-object.abstract';
+import { passwordPolicy } from '@domain/policies/password.policy';
 import * as bcrypt from 'bcrypt';
-import { passwordPolicy } from 'src/context/domain/policies';
 
 /**
  * Opciones para la creación de una contraseña

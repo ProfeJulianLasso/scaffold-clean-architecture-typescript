@@ -1,5 +1,8 @@
-import { ErrorType, ResultException } from '@common/exceptions';
-import type { Result } from '@common/utils/result-pattern';
+import {
+  ErrorType,
+  ResultException,
+} from '@common/exceptions/result.exception';
+import type { Result } from '@common/utils/result-pattern/result.pattern';
 import type { UserAggregate } from '../aggregates/users/user.aggregate';
 import type { UserEmail } from '../aggregates/users/value-objects/user-email.value-object';
 import type { IUserRepository } from '../repositories/user.repository';

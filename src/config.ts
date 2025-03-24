@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 // Determinar la ruta del archivo .env
 const envPath = path.resolve(process.cwd(), '.env');
@@ -29,7 +29,7 @@ export function initializeConfig(): void {
 // Obtener la configuración como un objeto
 export function getConfig(): { port: number; nodeEnv: string } {
   return {
-    port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3000,
+    port: process.env.PORT ? Number.parseInt(process.env.PORT, 10) : 3000,
     nodeEnv: process.env.NODE_ENV ?? 'development',
   };
 }

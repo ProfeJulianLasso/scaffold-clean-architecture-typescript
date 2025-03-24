@@ -1,5 +1,6 @@
-import { ErrorType, type ICommand } from '@common';
-import { Result } from '@common/utils/result-pattern';
+import type { ICommand } from '@common/application-commands/command.interface';
+import { ErrorType } from '@common/exceptions/result.exception';
+import { Result } from '@common/utils/result-pattern/result.pattern';
 import { userFactory } from '../../../domain/aggregates/users/user.factory';
 import { UserEmail } from '../../../domain/aggregates/users/value-objects/user-email.value-object';
 import type { IUserRepository } from '../../../domain/repositories/user.repository';
@@ -72,7 +73,7 @@ export class RegisterUserCommand
         new RegisterUserDTOResponse(
           true,
           'Usuario registrado exitosamente',
-          userAggregate.id.value,
+          userAggregate.id.toString(),
         ),
       );
     } catch (error) {

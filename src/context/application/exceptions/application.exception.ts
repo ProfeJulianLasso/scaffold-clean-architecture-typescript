@@ -1,4 +1,7 @@
-import { ErrorType, ResultException } from '@common/exceptions';
+import {
+  ErrorType,
+  ResultException,
+} from '@common/exceptions/result.exception';
 
 /**
  * Clase especializada para excepciones que ocurren en la capa de aplicación.

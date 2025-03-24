@@ -1,7 +1,9 @@
-import type { Result } from '@common/utils/result-pattern';
-import type { ITokenService, IUserRepository } from '@domain';
-import type { LoginDTORequest, LoginDTOResponse } from '../../dtos';
-import { LoginCommand } from '../implementations';
+import type { LoginDTORequest } from '@application/dtos/requests/login.dto.request';
+import type { LoginDTOResponse } from '@application/dtos/responses/login.dto.response';
+import type { Result } from '@common/utils/result-pattern/result.pattern';
+import type { IUserRepository } from '@domain/repositories/user.repository';
+import type { ITokenService } from '@domain/services/token.service';
+import { LoginCommand } from '../implementations/login.command';
 
 /**
  * Manejador para el comando de login

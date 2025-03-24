@@ -91,7 +91,7 @@ export abstract class Entity<ID extends IDValueObject> {
    */
   toJSON(): object {
     return {
-      id: this._id.value,
+      id: this._id.toString(),
     };
   }
 }

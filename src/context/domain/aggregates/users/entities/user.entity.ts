@@ -1,6 +1,6 @@
 import { Entity } from '@common/entities/entity.abstract';
-import { Result } from '@common/utils/result-pattern';
-import { passwordPolicy } from 'src/context/domain/policies';
+import { Result } from '@common/utils/result-pattern/result.pattern';
+import { passwordPolicy } from '@domain/policies/password.policy';
 import { userActivationPolicy } from '../../../policies/user-activation.policy';
 import { userUpdatePolicy } from '../../../policies/user-update.policy';
 import { UserCreatedEvent } from '../events/user-created.event';
@@ -220,9 +220,9 @@ export class User extends Entity<UserID> {
   toJSON(): object {
     return {
       ...super.toJSON(),
-      name: this._name.value,
-      email: this._email.value,
-      active: this._active.value,
+      name: this._name.toFormattedName(),
+      email: this._email.normalize(),
+      active: this._active.toString(),
       // La contraseña no se incluye intencionalmente
     };
   }

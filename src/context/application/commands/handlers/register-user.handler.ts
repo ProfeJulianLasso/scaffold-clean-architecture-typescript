@@ -1,10 +1,8 @@
-import type { Result } from '@common/utils/result-pattern';
-import type { IUserRepository } from '@domain';
-import type {
-  RegisterUserDTORequest,
-  RegisterUserDTOResponse,
-} from '../../dtos';
-import { RegisterUserCommand } from '../implementations';
+import type { RegisterUserDTORequest } from '@application/dtos/requests/register-user.dto.request';
+import type { RegisterUserDTOResponse } from '@application/dtos/responses/register-user.dto.response';
+import type { Result } from '@common/utils/result-pattern/result.pattern';
+import type { IUserRepository } from '@domain/repositories/user.repository';
+import { RegisterUserCommand } from '../implementations/register-user.command';
 
 /**
  * Manejador para el comando de registro de usuario

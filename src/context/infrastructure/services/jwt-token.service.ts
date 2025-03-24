@@ -1,5 +1,5 @@
-import { ErrorType } from '@common/exceptions';
-import { Result } from '@common/utils/result-pattern';
+import { ErrorType } from '@common/exceptions/result.exception';
+import { Result } from '@common/utils/result-pattern/result.pattern';
 import { Injectable } from '@nestjs/common';
 import type { ConfigService } from '@nestjs/config';
 import type { JwtService } from '@nestjs/jwt';
@@ -30,7 +30,10 @@ export class JwtTokenService implements ITokenService {
     expiresIn?: string,
   ): Promise<Result<string>> {
     try {
-      const defaultExpiresIn = this._configService.get<string>('JWT_EXPIRES_IN', '1h');
+      const defaultExpiresIn = this._configService.get<string>(
+        'JWT_EXPIRES_IN',
+        '1h',
+      );
 
       const token = this._jwtService.sign(payload, {
         expiresIn: expiresIn ?? defaultExpiresIn,

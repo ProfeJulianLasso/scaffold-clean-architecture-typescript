@@ -1,5 +1,5 @@
-import { ErrorType } from '@common/exceptions';
-import { Result } from '@common/utils/result-pattern';
+import { ErrorType } from '@common/exceptions/result.exception';
+import { Result } from '@common/utils/result-pattern/result.pattern';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import type { Model } from 'mongoose';
@@ -7,8 +7,8 @@ import type { UserAggregate } from '../../../domain/aggregates/users/user.aggreg
 import type { UserEmail } from '../../../domain/aggregates/users/value-objects/user-email.value-object';
 import type { UserID } from '../../../domain/aggregates/users/value-objects/user-id.value-object';
 import type { IUserRepository } from '../../../domain/repositories/user.repository';
-import { UserSchema } from '../schemas/user.schema';
 import { userMapper } from '../../mappers/user.mapper';
+import { UserSchema } from '../schemas/user.schema';
 
 /**
  * Implementación de MongoDB del repositorio de usuario
@@ -30,7 +30,9 @@ export class MongoUserRepository implements IUserRepository {
    */
   async findById(id: UserID): Promise<Result<UserAggregate | null>> {
     try {
-      const userDocument = await this._userModel.findOne({ _id: id.value }).exec();
+      const userDocument = await this._userModel
+        .findOne({ _id: id.value })
+        .exec();
 
       if (!userDocument) {
         return Result.success(null);
@@ -57,7 +59,9 @@ export class MongoUserRepository implements IUserRepository {
    */
   async findByEmail(email: UserEmail): Promise<Result<UserAggregate | null>> {
     try {
-      const userDocument = await this._userModel.findOne({ email: email.value }).exec();
+      const userDocument = await this._userModel
+        .findOne({ email: email.value })
+        .exec();
 
       if (!userDocument) {
         return Result.success(null);
@@ -86,11 +90,12 @@ export class MongoUserRepository implements IUserRepository {
     try {
       const userData = await userMapper.toPersistence(userAggregate);
 
-      await this._userModel.findOneAndUpdate(
-        { _id: userData._id },
-        userData,
-        { upsert: true, new: true },
-      ).exec();
+      await this._userModel
+        .findOneAndUpdate({ _id: userData._id }, userData, {
+          upsert: true,
+          new: true,
+        })
+        .exec();
 
       return Result.success();
     } catch (error) {
@@ -113,7 +118,9 @@ export class MongoUserRepository implements IUserRepository {
    */
   async exists(email: UserEmail): Promise<Result<boolean>> {
     try {
-      const count = await this._userModel.countDocuments({ email: email.value }).exec();
+      const count = await this._userModel
+        .countDocuments({ email: email.value })
+        .exec();
       return Result.success(count > 0);
     } catch (error) {
       return Result.fail(

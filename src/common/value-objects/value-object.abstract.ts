@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-import { ValidationHandler } from '@common/validation';
+import { ValidationHandler } from '@common/validation/validation-handler.abstract';
 
 /**
  * Clase base abstracta para implementar Value Objects.

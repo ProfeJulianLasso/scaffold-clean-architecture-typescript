@@ -1,4 +1,4 @@
-import type { Result } from '@common/utils/result-pattern';
+import type { Result } from '@common/utils/result-pattern/result.pattern';
 import type { IUserRepository } from '../../domain/repositories/user.repository';
 import type { ITokenService } from '../../domain/services/token.service';
 import { LoginHandler } from '../commands/handlers/login.handler';

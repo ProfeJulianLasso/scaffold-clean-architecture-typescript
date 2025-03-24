@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable no-unused-vars */
-import { UUIDv7 } from '@common/utils/uuid-v7';
+import { UUIDv7 } from '@common/utils/uuid-v7/uuid.v7';
 import { ValueObject } from './value-object.abstract';
 
 /**

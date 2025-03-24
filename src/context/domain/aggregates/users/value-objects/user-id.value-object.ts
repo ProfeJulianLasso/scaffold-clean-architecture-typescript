@@ -1,4 +1,4 @@
-import { IDValueObject } from '@common/value-objects';
+import { IDValueObject } from '@common/value-objects/id.value-object.abstract';
 
 /**
  * Value Object que representa el identificador único de un usuario

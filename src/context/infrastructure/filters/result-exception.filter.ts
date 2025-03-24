@@ -1,4 +1,4 @@
-import { ResultException } from '@common/exceptions';
+import { ResultException } from '@common/exceptions/result.exception';
 import {
   type ArgumentsHost,
   Catch,

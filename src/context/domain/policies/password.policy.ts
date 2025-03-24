@@ -1,5 +1,5 @@
-import { ErrorType } from '@common/exceptions';
-import { Result } from '@common/utils/result-pattern';
+import { ErrorType } from '@common/exceptions/result.exception';
+import { Result } from '@common/utils/result-pattern/result.pattern';
 import type { UserPassword } from '../aggregates/users/value-objects/user-password.value-object';
 
 // Patrones para validar los requisitos de seguridad

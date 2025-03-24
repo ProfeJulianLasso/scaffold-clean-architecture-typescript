@@ -1,5 +1,5 @@
-import { ErrorType } from '@common/exceptions';
-import { Result } from '@common/utils/result-pattern';
+import { ErrorType } from '@common/exceptions/result.exception';
+import { Result } from '@common/utils/result-pattern/result.pattern';
 import type { User } from '../aggregates/users/entities/user.entity';
 
 /**

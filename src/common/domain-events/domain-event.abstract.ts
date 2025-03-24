@@ -1,4 +1,4 @@
-import { UUIDv7 } from '@common/utils/uuid-v7';
+import { UUIDv7 } from '@common/utils/uuid-v7/uuid.v7';
 
 /**
  * Clase abstracta para los eventos de dominio

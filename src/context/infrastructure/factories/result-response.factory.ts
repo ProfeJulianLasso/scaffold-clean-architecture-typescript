@@ -1,4 +1,4 @@
-import type { Result } from '@common/utils/result-pattern';
+import type { Result } from '@common/utils/result-pattern/result.pattern';
 import { HttpStatus } from '@nestjs/common';
 import { ResultResponseDTO } from '../dtos/result-response.dto';
 
