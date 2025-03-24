@@ -209,6 +209,10 @@ export class User extends Entity<UserID> {
     return this._active.value;
   }
 
+  getPassword(): Promise<UserPassword> {
+    return this._password.hash();
+  }
+
   /**
    * Sobrescribe toJSON para serializar la entidad
    * No incluye la contraseña por seguridad

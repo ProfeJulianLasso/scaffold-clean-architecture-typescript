@@ -1,17 +1,19 @@
+import type { ICommand } from '@common';
 import { ErrorType } from '@common/exceptions';
 import { Result } from '@common/utils/result-pattern';
-import { UserEmail } from '../../../domain/aggregates/users/value-objects/user-email.value-object';
+import { UserEmail } from '@domain';
 import type { IUserRepository } from '../../../domain/repositories/user.repository';
 import type { ITokenService } from '../../../domain/services/token.service';
 import type { LoginDTORequest } from '../../dtos/requests/login.dto.request';
 import { LoginDTOResponse } from '../../dtos/responses/login.dto.response';
 import { ApplicationException } from '../../exceptions/application.exception';
-import type { ILoginCommand } from '../interfaces/login.command.interface';
 
 /**
  * Implementación del comando para iniciar sesión
  */
-export class LoginCommand implements ILoginCommand {
+export class LoginCommand
+  implements ICommand<LoginDTORequest, LoginDTOResponse>
+{
   /**
    * @param _userRepository - Repositorio de usuarios
    * @param _tokenService - Servicio de tokens
@@ -26,9 +28,7 @@ export class LoginCommand implements ILoginCommand {
    * @param request - DTO con los datos de solicitud
    * @returns Promise con el resultado de la operación
    */
-  async execute(
-    request: LoginDTORequest,
-  ): Promise<Result<LoginDTOResponse>> {
+  async execute(request: LoginDTORequest): Promise<Result<LoginDTOResponse>> {
     try {
       // Validamos el email
       const userEmail = new UserEmail(request.email);

@@ -1,5 +1,6 @@
 import { type INestApplication, Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { getConfig, initializeConfig } from './config';
 import { InfrastructureModule } from './context/infrastructure/infrastructure.module';
@@ -23,6 +24,22 @@ function configureApp(app: INestApplication): INestApplication {
   app.enableCors();
 
   return app;
+}
+
+/**
+ * Configuración de Swagger para documentación de la API
+ * @param app La instancia de la aplicación NestJS
+ */
+function configureSwagger(app: INestApplication): void {
+  const options = new DocumentBuilder()
+    .setTitle('API de Autenticación')
+    .setDescription('API para gestión de usuarios y autenticación')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(app, options);
+  SwaggerModule.setup('api/docs', app, document);
 }
 
 /**

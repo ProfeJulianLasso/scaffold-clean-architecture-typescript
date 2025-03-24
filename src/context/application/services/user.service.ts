@@ -44,9 +44,7 @@ export class UserService {
    * @param request - DTO con los datos de solicitud
    * @returns Promise con el resultado de la operación
    */
-  async login(
-    request: LoginDTORequest,
-  ): Promise<Result<LoginDTOResponse>> {
+  async login(request: LoginDTORequest): Promise<Result<LoginDTOResponse>> {
     return this._loginHandler.handle(request);
   }
 }

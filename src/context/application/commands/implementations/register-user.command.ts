@@ -1,4 +1,4 @@
-import { ErrorType } from '@common/exceptions';
+import { ErrorType, type ICommand } from '@common';
 import { Result } from '@common/utils/result-pattern';
 import { userFactory } from '../../../domain/aggregates/users/user.factory';
 import { UserEmail } from '../../../domain/aggregates/users/value-objects/user-email.value-object';
@@ -6,16 +6,17 @@ import type { IUserRepository } from '../../../domain/repositories/user.reposito
 import type { RegisterUserDTORequest } from '../../dtos/requests/register-user.dto.request';
 import { RegisterUserDTOResponse } from '../../dtos/responses/register-user.dto.response';
 import { ApplicationException } from '../../exceptions/application.exception';
-import type { IRegisterUserCommand } from '../interfaces/register-user.command.interface';
 
 /**
  * Implementación del comando para registrar un nuevo usuario
  */
-export class RegisterUserCommand implements IRegisterUserCommand {
+export class RegisterUserCommand
+  implements ICommand<RegisterUserDTORequest, RegisterUserDTOResponse>
+{
   /**
-   * @param _userRepository - Repositorio de usuarios
+   * @param userRepository - Repositorio de usuarios
    */
-  constructor(private readonly _userRepository: IUserRepository) {}
+  constructor(private readonly userRepository: IUserRepository) {}
 
   /**
    * Ejecuta el comando de registro
@@ -30,7 +31,7 @@ export class RegisterUserCommand implements IRegisterUserCommand {
       const userEmail = new UserEmail(request.email);
 
       // Verificamos si ya existe un usuario con ese email
-      const existsResult = await this._userRepository.exists(userEmail);
+      const existsResult = await this.userRepository.exists(userEmail);
 
       if (existsResult.isFailure()) {
         return Result.failure(existsResult.getError());
@@ -60,7 +61,7 @@ export class RegisterUserCommand implements IRegisterUserCommand {
       const userAggregate = userAggregateResult.getValue();
 
       // Guardamos el usuario en el repositorio
-      const saveResult = await this._userRepository.save(userAggregate);
+      const saveResult = await this.userRepository.save(userAggregate);
 
       if (saveResult.isFailure()) {
         return Result.failure(saveResult.getError());

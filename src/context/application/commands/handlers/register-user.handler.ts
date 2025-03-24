@@ -1,8 +1,10 @@
 import type { Result } from '@common/utils/result-pattern';
-import type { IUserRepository } from '../../../domain/repositories/user.repository';
-import type { RegisterUserDTORequest } from '../../dtos/requests/register-user.dto.request';
-import type { RegisterUserDTOResponse } from '../../dtos/responses/register-user.dto.response';
-import { RegisterUserCommand } from '../implementations/register-user.command';
+import type { IUserRepository } from '@domain';
+import type {
+  RegisterUserDTORequest,
+  RegisterUserDTOResponse,
+} from '../../dtos';
+import { RegisterUserCommand } from '../implementations';
 
 /**
  * Manejador para el comando de registro de usuario
@@ -11,10 +13,10 @@ export class RegisterUserHandler {
   private readonly _registerUserCommand: RegisterUserCommand;
 
   /**
-   * @param _userRepository - Repositorio de usuarios
+   * @param userRepository - Repositorio de usuarios
    */
-  constructor(private readonly _userRepository: IUserRepository) {
-    this._registerUserCommand = new RegisterUserCommand(_userRepository);
+  constructor(private readonly userRepository: IUserRepository) {
+    this._registerUserCommand = new RegisterUserCommand(this.userRepository);
   }
 
   /**
