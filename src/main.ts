@@ -2,8 +2,8 @@ import { type INestApplication, Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
-import { getConfig, initializeConfig } from './config';
-import { InfrastructureModule } from './context/infrastructure/infrastructure.module';
+import { AppModule } from './app.module';
+import { getConfig, initializeConfig } from './main.config';
 
 // Inicializar configuración
 initializeConfig();
@@ -52,7 +52,7 @@ async function bootstrap(): Promise<void> {
     logger.log('🏁 Iniciando aplicación...');
 
     // Crear aplicación NestJS
-    const app = await NestFactory.create(InfrastructureModule, {
+    const app = await NestFactory.create(AppModule, {
       logger: ['error', 'warn', 'log', 'debug', 'verbose'],
     });
 

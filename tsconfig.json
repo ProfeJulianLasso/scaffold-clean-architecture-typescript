@@ -18,29 +18,20 @@
     "strictBindCallApply": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@common": [
-        "./src/common"
-      ],
       "@common/*": [
-        "./src/common/*"
+        "./src/shared/common/*"
       ],
-      "@domain": [
-        "./src/context/domain"
+      "@shared/*": [
+        "./src/shared/*"
       ],
-      "@domain/*": [
-        "./src/context/domain/*"
+      "@domain/security/*": [
+        "src/contexts/security/domain/*"
       ],
-      "@application": [
-        "./src/context/application"
-      ],
-      "@application/*": [
-        "./src/context/application/*"
-      ],
-      "@infrastructure": [
-        "./src/context/infrastructure"
+      "@application/security/*": [
+        "src/contexts/security/application/*"
       ],
       "@infrastructure/*": [
-        "./src/context/infrastructure/*"
+        "src/contexts/security/infrastructure/*"
       ],
     }
   }
