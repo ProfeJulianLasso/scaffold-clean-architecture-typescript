@@ -63,7 +63,7 @@ export abstract class StringValueObject extends ValueObject<string> {
   protected validate(value: string): void {
     // Validación de cadena vacía (solo si no se permite)
     if (!this.options.allowEmpty && value.length === 0) {
-      this.reportError('El valor no puede estar vacío', 'value');
+      this.reportError('El valor no puede estar vacío', this._objectName);
     }
 
     // Validación de longitud mínima
@@ -73,7 +73,7 @@ export abstract class StringValueObject extends ValueObject<string> {
     ) {
       this.reportError(
         `El valor debe tener al menos ${this.options.minLength} caracteres`,
-        'value',
+        this._objectName,
         { actualLength: value.length, minLength: this.options.minLength },
       );
     }
@@ -85,7 +85,7 @@ export abstract class StringValueObject extends ValueObject<string> {
     ) {
       this.reportError(
         `El valor no puede exceder los ${this.options.maxLength} caracteres`,
-        'value',
+        this._objectName,
         { actualLength: value.length, maxLength: this.options.maxLength },
       );
     }
@@ -96,7 +96,7 @@ export abstract class StringValueObject extends ValueObject<string> {
         this.options.patternMessage ??
         'El valor no cumple con el formato requerido';
 
-      this.reportError(message, 'value', {
+      this.reportError(message, this._objectName, {
         pattern: this.options.pattern.toString(),
       });
     }

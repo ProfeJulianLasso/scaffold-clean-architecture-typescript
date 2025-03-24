@@ -62,7 +62,7 @@ export abstract class NumberValueObject extends ValueObject<number> {
   protected validate(value: number): void {
     // Comprobamos que sea un número válido (no NaN o Infinity)
     if (!Number.isFinite(value)) {
-      this.reportError('El valor debe ser un número finito', 'value', {
+      this.reportError('El valor debe ser un número finito', this._objectName, {
         providedValue: value,
       });
       return;
@@ -72,7 +72,7 @@ export abstract class NumberValueObject extends ValueObject<number> {
     if (this.options.min !== undefined && value < this.options.min) {
       this.reportError(
         `El valor no puede ser menor que ${this.options.min}`,
-        'value',
+        this._objectName,
         { actualValue: value, min: this.options.min },
       );
     }
@@ -81,28 +81,28 @@ export abstract class NumberValueObject extends ValueObject<number> {
     if (this.options.max !== undefined && value > this.options.max) {
       this.reportError(
         `El valor no puede ser mayor que ${this.options.max}`,
-        'value',
+        this._objectName,
         { actualValue: value, max: this.options.max },
       );
     }
 
     // Validación de número entero
     if (this.options.integer && !Number.isInteger(value)) {
-      this.reportError('El valor debe ser un número entero', 'value', {
+      this.reportError('El valor debe ser un número entero', this._objectName, {
         providedValue: value,
       });
     }
 
     // Validación de valores negativos
     if (!this.options.allowNegative && value < 0) {
-      this.reportError('No se permiten valores negativos', 'value', {
+      this.reportError('No se permiten valores negativos', this._objectName, {
         providedValue: value,
       });
     }
 
     // Validación de valor cero
     if (!this.options.allowZero && value === 0) {
-      this.reportError('El valor no puede ser cero', 'value');
+      this.reportError('El valor no puede ser cero', this._objectName);
     }
 
     // Validación de decimales máximos
@@ -111,7 +111,7 @@ export abstract class NumberValueObject extends ValueObject<number> {
       if (decimalStr.length > this.options.maxDecimals) {
         this.reportError(
           `El valor no puede tener más de ${this.options.maxDecimals} decimales`,
-          'value',
+          this._objectName,
           {
             providedValue: value,
             decimalsCount: decimalStr.length,
@@ -128,7 +128,7 @@ export abstract class NumberValueObject extends ValueObject<number> {
         this.reportError(
           result.message ??
             'El valor no cumple con la validación personalizada',
-          'value',
+          this._objectName,
           { providedValue: value },
         );
       }

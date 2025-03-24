@@ -11,7 +11,7 @@ import { ValidationHandler } from '@shared/domain/validation/validation-handler.
  */
 export abstract class ValueObject<ValueType> extends ValidationHandler {
   private readonly _value: ValueType;
-  private readonly _objectName: string;
+  protected readonly _objectName: string;
 
   /**
    * Crea una nueva instancia de Value Object
