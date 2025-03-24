@@ -30,7 +30,7 @@
       "@application/security/*": [
         "src/contexts/security/application/*"
       ],
-      "@infrastructure/*": [
+      "@infrastructure/security/*": [
         "src/contexts/security/infrastructure/*"
       ],
     }

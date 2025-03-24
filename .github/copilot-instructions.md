@@ -1,0 +1,245 @@
+# Instrucciones para GitHub Copilot
+
+## Información general
+
+Lenguaje: TypeScript
+Framework: NestJS
+Base de datos: MongoDB con Mongoose y TypeORM para bases de datos relacionales
+
+## Descripción del proyecto
+
+Este proyecto es una aplicación de ejemplo para el curso de TypeScript y NestJS.
+Se trata de una aplicación de gestión de usuarios que permite crear, editar, eliminar y listar todos los usuarios.
+
+## Instrucciones generales
+
+- Siempre responder en español
+- Siempre usar inglés para el código fuente
+- Siempre aplicar buenas prácticas de programación
+- Siempre seguir los principios SOLID, especialmente el principio de responsabilidad única e inversión de dependencias
+- Siempre aplicar patrones de diseño cuando sea necesario
+- El código debe ser simple y legible, siguiendo el principio KISS (Keep It Simple, Stupid)
+- Evitar código redundante siguiendo el principio DRY (Don't Repeat Yourself)
+- No implementar funcionalidades que no se hayan solicitado explícitamente, adhiriéndose al principio YAGNI (You Ain't Gonna Need It)
+- Documentar el código sólo si se solicita de forma explicita de forma profesional y detallada, siguiendo las convenciones de estilo de TSDoc
+- Hacer pruebas unitarias bajo el patrón AAA (Arrange, Act, Assert) sólo si se solicita de forma explícita
+- Cuando se escriba una clase con sólo métodos estáticos, se debe dar preferencia a objetos literales
+- Siempre dar preferencia a Result Pattern y ResultException para manejar resultados de operaciones y errores
+
+## TypeScript
+
+### Convenciones de Nomenclatura
+
+- Interfaces escritas tipo PascalCase, prefijo "I" (ejemplo: `ICalculatorService`)
+- Types escritos en PascalCase sin prefijo (ejemplo: `UserDto`)
+- Atributos escritos tipo camelCase, prefijo guión bajo (`_`) para variables privadas
+- Variables locales escritas con camelCase, sin prefijo
+- Constantes globales en UPPER_SNAKE_CASE
+- Nombres de archivos en kebab-case.ts
+- Nombres de clases en PascalCase
+- Nombres de métodos en camelCase
+- Nombres de enums en PascalCase, y sus valores en PascalCase
+- Nombres descriptivos que indiquen propósito y siempre evitar abreviaciones
+
+### Gestión de Variables
+
+- Preferir el uso de `const` sobre `let` y nunca usar `var`
+- Usar destructuring para extraer propiedades de objetos y arrays
+- Utilizar parámetros por defecto en lugar de condicionales
+- Siempre inicializar variables al declararlas
+- Evitar cadenas de nullish/optional chaining excesivamente largas
+- Usar el operador spread (`...`) para copiar objetos o arrays sin mutar originales
+
+### Tipado
+
+- Priorizar el uso del tipo `unknown` sobre `any`
+- Definir explícitamente los tipos de retorno en funciones
+- Usar `enum` para definir conjuntos finitos de valores relacionados
+- Aprovechar Union Types (`type Status = 'pending' | 'completed' | 'failed'`)
+- Implementar Intersection Types para composición de tipos
+- Usar Generics para funciones y clases que trabajan con tipos variables
+- Aplicar Type Guards (`instanceof`, `typeof`, predicados tipo) para narrowing seguro
+- Usar `Record<K, V>` para definir objetos con claves y valores específicos
+- Implementar `Partial<T>` para definir objetos que pueden tener propiedades opcionales
+- Utilizar `Pick<T, K>` para crear tipos que seleccionen un subconjunto de propiedades
+- Aplicar `Omit<T, K>` para crear tipos que excluyan propiedades específicas
+- Usar `Readonly<T>` para definir tipos de solo lectura
+- Implementar `Required<T>` para hacer obligatorias todas las propiedades opcionales
+- Aplicar `NonNullable<T>` para eliminar null y undefined de un tipo
+
+### Estructuras de Datos
+
+- Priorizar el uso de `Map` sobre objetos para almacenar pares clave-valor
+- Usar `Set` para almacenar colecciones de valores únicos
+- Implementar Arrays tipados para colecciones homogéneas
+- Usar Tuples para arrays de longitud fija con tipos diferentes
+- Preferir bucles imperativos sobre métodos funcionales
+- Siempre preferir un if sin else sobre un if con else
+
+### Funciones
+
+- Limitar a máximo 3 parámetros por función; usar objeto para más parámetros
+- Utilizar arrow functions para preservar el contexto `this`
+- Usar `async/await` en lugar de callbacks o promesas encadenadas
+- Aplicar la técnica de early return para reducir anidación
+- Implementar funciones puras cuando sea posible (sin efectos secundarios)
+
+### Manejo de Errores
+
+- Dar prioridad al patrón `Result<T>` sobre el uso de bloques `try/catch`
+- Usar `try/catch` estrictamente cuando sea necesario (I/O, parseo, etc.)
+- Crear tipos personalizados de error extendiendo `ResultException`
+- Implementar logging adecuado en manejo de errores
+
+### Organización de Código
+
+- Un componente/clase por archivo
+- Implementar los modificadores de acceso adecuados (private, protected), nunca usar public
+- Los atributos que mapean servicios inyectados deben ser readonly, no usar `_` comp prefijo y usar la forma estándar de inyección de dependencias de TypeScript
+- Las inyecciones de dependencias deben usarse con `this.[dependencia]` al ser utilizadas en el mismo constructor
+
+### Avanzado
+
+- Usar Mapped Types para transformaciones de tipos
+- No implementar Type Inference para reducir redundancia de tipos
+- Utilizar Conditional Types para lógica a nivel de tipos
+- Usar inyección de dependencias por constructor
+- Inyectar interfaces, no implementaciones concretas
+
+## Testing
+
+- Siempre cubrir casos de borde y de esquina en las pruebas
+- Mantener independencia entre pruebas
+- Nunca escribir pruebas repetitivas
+- El titulo de las pruebas debe ser claro, descriptivo y en español
+- Usar `describe` para agrupar pruebas y `it` para definir pruebas individuales
+- Usar `beforeEach` para inicializar variables y `afterEach` para limpiar
+- Usar `beforeAll` para inicializar variables globales y `afterAll` para limpiar
+- Usar `jest.fn` para simular funciones
+- Usar `jest.mock` para simular dependencias
+- Usar `jest.spyOn` para simular funciones
+- Usar `jest.resetAllMocks` para limpiar todas las simulaciones
+- Usar `jest.resetModules` para limpiar todas las simulaciones de módulos
+- Usar `jest.clearAllMocks` para limpiar todas las simulaciones de funciones
+- Usar `jest.useFakeTimers` para simular temporizadores
+- Usar `jest.advanceTimersByTime` para avanzar el temporizador
+- Usar `jest.runAllTimers` para ejecutar todos los temporizadores pendientes
+- Usar `jest.setSystemTime` para configurar el tiempo de ejecución
+
+## Estructura de directorios
+
+```text
+src/
+├── contexts/
+│   ├── {name}/                                         # Contexto Acotado: {name}
+│   │   ├── domain/                                     # Capa de Dominio (pura)
+│   │   │   ├── aggregates/                             # Agregados
+│   │   │   │   └── {name}                              # Nombre del agregado
+│   │   │   │       ├── entities/                       # Entidades de dominio
+│   │   │   │       │   └── {name}.entity.ts            # Entidad `{Name}Entity`
+│   │   │   │       ├── events/                         # Eventos de dominio
+│   │   │   │       │   └── {name}.event.ts             # Evento `{Name}Event`
+│   │   │   │       ├── value-objects/                  # Objetos de valor
+│   │   │   │       │   └── {name}.value-object.ts      # Objeto de valor `{Name}ValueObject`
+│   │   │   │       ├── {name}.aggregate.ts             # Agregado `{Name}Aggregate`
+│   │   │   │       └── {name}.factory.ts               # Fábrica del agregado `{Name}Factory`
+│   │   │   ├── exceptions/                             # Excepciones de dominio
+│   │   │   │   └── {name}.exception.ts                 # Excepción `{Name}Exception`
+│   │   │   ├── policies/                               # Políticas de dominio
+│   │   │   │   └── {name}.policy.ts                    # Política `{Name}Policy`
+│   │   │   ├── services/                               # Servicios de dominio
+│   │   │   │   └── {name}.service.ts                   # Servicio `{Name}Service`
+│   │   │   ├── domain.interface.ts                     # Interfaces de dominio `Domain`
+│   │   │   └── domain.implementation.ts                # Implementaciones de dominio `DomainImpl` implementa `Domain`
+│   │   │
+│   │   ├── application/                                # Capa de Aplicación (pura)
+│   │   │   ├── abstractions/                           # Abstracciones e interfaces
+│   │   │   │   ├── services/                           # Interfaces de servicios
+│   │   │   │   │   └── {name}.service.ts               # Servicio `I{Name}Service`
+│   │   │   │   ├── messaging/                          # Interfaces para mensajería
+│   │   │   │   │   └── {name}.interface.ts             # Interfaz de mensajería `I{Name}Messaging`
+│   │   │   │   └── persistence/                        # Interfaces para persistencia
+│   │   │   │       └── models/                         # Interfaces para modelos
+│   │   │   │       │   └── {name}.model.ts             # Modelo `I{Name}Model`
+│   │   │   │       └── repositories/                   # Interfaces para repositorios
+│   │   │   │           └── {name}.repository.ts        # Repositorio `I{Name}Repository`
+│   │   │   ├── dtos/                                   # DTOs para comunicación
+│   │   │   │   ├── commands/                           # DTOs para comandos
+│   │   │   │   │   ├── {name}.dto.request.ts           # Implementación de comandos `Command{Name}DTORequest`
+│   │   │   │   ├── queries/                            # DTOs para consultas
+│   │   │   │   │   ├── {name}.dto.request.ts           # Implementación de consultas `Query{Name}DTORequest`
+│   │   │   │   ├── responses/                          # DTOs para respuestas
+│   │   │   │   │   └── {name}.dto.response.ts          # Implementación de respuestas `{Name}DTOResponse`
+│   │   │   │   └── mappers/                            # Funciones de mapeo
+│   │   │   │       └── {name}.mapper.ts                # Implementación de mappers `{Name}Mapper` (DTO app ↔ DTO Domain)
+│   │   │   ├── cqrs/                                   # Implementación CQRS
+│   │   │   │   ├── commands/                           # Comandos
+│   │   │   │   │   ├── handlers/                       # Manejadores de comandos
+│   │   │   │   │   │   └── {name}.handler.ts           # Manejador de comandos `{Name}CommandHandler`
+│   │   │   │   │   └── implementations/                # Implementaciones
+│   │   │   │   │       └── {name}.command.ts           # Implementación de comandos `{Name}Command` implementa `ICommand`
+│   │   │   │   └── queries/                            # Consultas
+│   │   │   │       ├── handlers/                       # Manejadores de queries
+│   │   │   │       │   └── {name}.handler.ts           # Manejador de queries `{Name}QueryHandler`
+│   │   │   │       └── implementations/                # Implementaciones
+│   │   │   │           └── {name}.query.ts             # Implementación de queries `{Name}Query` implementa `IQuery`
+│   │   │   ├── services/                               # Servicios de aplicación
+│   │   │   │   └── {name}.service.ts                   # Servicio `{Name}Service`
+│   │   │   ├── application.abstract.ts                 # Clases abstractas de aplicación `Application`
+│   │   │   └── application.implementation.ts           # Implementaciones de aplicación `ApplicationImpl` extiende `Application`
+│   │   │
+│   │   └── infrastructure/                             # Capa de Infraestructura
+│   │       ├── api/                                    # Componentes API
+│   │       │   ├── controllers/                        # Controladores REST
+│   │       │   │   └── {name}.controller.ts            # Controlador `{Name}Controller`
+│   │       │   └── dtos/                               # DTOs específicos para API
+│   │       │       ├── request/                        # DTOs para requests API
+│   │       │       │   └── {name}.dto.request.ts       # DTO para requests `{Name}DTORequest`
+│   │       │       ├── response/                       # DTOs para responses API
+│   │       │       │   └── {name}.dto.response.ts      # DTO para responses `{Name}DTOResponse`
+│   │       │       └── mappers/                        # Mappers específicos para API
+│   │       │           └── {name}.mapper.ts            # Implementación de mappers `{Name}Mapper` (DTO API ↔ DTO Application)
+│   │       ├── persistence/                            # Persistencia
+│   │       │   ├── mongodb/                            # Implementación MongoDB
+│   │       │   │   ├── schemas/                        # Esquemas Mongoose
+│   │       │   │   │   └── {name}.schema.ts            # Esquema `{Name}Schema` implementa `I{Name}Model` del aplicativo
+│   │       │   │   ├── repositories/                   # Implementaciones repositorios
+│   │       │   │   │   └── {name}.repository.ts        # Repositorio `{Name}Repository` implementa `I{Name}Repository` del aplicativo
+│   │       │   │   ├── mappers/                        # Funciones de mapeo
+│   │       │   │   │   └── {name}.mongo.mapper.ts      # Implementación de mappers `{Name}MongoMapper` (DTO app ↔ Model from persistence application)
+│   │       │   │   ├── mongo.configuration.ts          # Configuración de MongoDB
+│   │       │   │   └── mongo.module.ts                 # Módulo MongoDB
+│   │       │   └── typeorm/                            # Alternativa TypeORM
+│   │       │       ├── entities/                       # Entidades ORM
+│   │       │       │   └── {name}.entity.ts            # Entidad `{Name}Entity` implementa `I{Name}Model` del aplicativo
+│   │       │       ├── repositories/                   # Implementaciones repositorios
+│   │       │       │   └── {name}.repository.ts        # Repositorio `{Name}Repository` implementa `I{Name}Repository` del aplicativo
+│   │       │       ├── mappers/                        # Funciones de mapeo
+│   │       │       │   └── {name}.typeorm.mapper.ts    # Implementación de mappers `{Name}TypeormMapper` (DTO app ↔ Model from persistence application)
+│   │       │       ├── typeorm.configuration.ts        # Configuración de TypeORM
+│   │       │       └── typeorm.module.ts               # Módulo TypeORM
+│   │       ├── services/                               # Servicios de infraestructura
+│   │       │   └── {name}.service.ts                   # Servicio `{Name}Service` implementa `I{Name}Service` del aplicativo
+│   │       └── {name}.module.ts                        # Módulo NestJS del contexto `{Name}Context`
+│   │
+│   └── otro-contexto/                                  # Contexto Acotado: Otro
+│       ├── domain/                                     # (estructura similar)
+│       ├── application/                                # (estructura similar)
+│       └── infrastructure/                             # (estructura similar)
+│
+├── shared/                                             # Código compartido
+│   ├── domain/                                         # Dominio compartido
+│   │   ├── value-objects/                              # Objetos de valor comunes
+│   │   └── exceptions/                                 # Excepciones comunes
+│   ├── application/                                    # Aplicación compartida
+│   │   ├── abstractions/                               # Interfaces comunes
+│   │   ├── dtos/                                       # DTOs compartidos
+│   │   └── exceptions/                                 # Excepciones comunes
+│   └── infrastructure/                                 # Infraestructura compartida
+│       ├── exceptions/                                 # Excepciones comunes
+│       ├── utils/                                      # Utilidades
+│       └── interfaces/                                 # Interfaces compartidas
+├── app.module.ts                                       # Módulo principal
+├── main.config.ts                                      # Configuración principal
+└── main.ts                                             # Punto de entrada
+```
