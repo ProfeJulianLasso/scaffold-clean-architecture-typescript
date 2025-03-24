@@ -6,10 +6,38 @@ Lenguaje: TypeScript
 Framework: NestJS
 Base de datos: MongoDB con Mongoose y TypeORM para bases de datos relacionales
 
+El proyecto siempre debe de aplicar DDD con Arquitectura Hexagonal. Para ello, se debe de seguir el siguiente enfoque:
+
+```text
+DOMINIO ← APLICACIÓN ← INFRAESTRUCTURA
+```
+
+En este modelo, la infraestructura solo conoce a la aplicación, y es la aplicación quien conoce al dominio. Para poder aplicar este modelo necesitaremos:
+
+- Interfaces de repositorio en la capa de aplicación.
+- DTOs definidos en la capa de aplicación para la comunicación entre aplicación e infraestructura
+- Servicios de traducción/mapeo en la capa de aplicación para convertir entre DTOs y objetos del dominio
+- Debe ser la capa de aplicación quien defina por medio de interfaces, cómo debe la capa de infraestructura debe implementar los esquemas de persistencia. De esta forma aplicación sabrá cómo se persisten los datos.
+- La capa de dominio y la capa de aplicación son totalmente puros en su implementación, es decir, no pueden depender de librerías o cualquier otro tercero.
+- La capa de aplicación debe implementar CQRS.
+
+Esto sería el flujo de datos
+
+```text
+Base de datos → Infraestructura → DTOs → Aplicación → [mapeo] → Objetos del dominio → Dominio
+```
+
+Y en la dirección contraria
+
+```text
+Dominio → Objetos del dominio → Aplicación → [mapeo] → DTOs → Infraestructura → Base de datos
+```
+
+En lo anterior, la base de datos es sólo un ejemplo del punto final, porque esto podría ser un broker o cualquier otra cosa.
+
 ## Descripción del proyecto
 
 Este proyecto es una aplicación de ejemplo para el curso de TypeScript y NestJS.
-Se trata de una aplicación de gestión de usuarios que permite crear, editar, eliminar y listar todos los usuarios.
 
 ## Instrucciones generales
 
