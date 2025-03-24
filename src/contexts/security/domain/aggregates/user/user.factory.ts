@@ -21,7 +21,7 @@ export const userFactory = {
     const userId = new UserId();
     const userName = new UserName(name);
     const userEmail = new UserEmail(email);
-    const userPassword = new UserPassword(password);
+    const userPassword = new UserPassword(password); // Contraseña en texto plano
     const userStatus = new UserStatus(isActive);
 
     return UserAggregate.create(
@@ -34,19 +34,19 @@ export const userFactory = {
   },
 
   /**
-   * Reconstruye un usuario a partir de datos primitivos
+   * Reconstruye un usuario a partir de datos persistidos (con contraseña hasheada)
    */
   reconstruct(
     id: string,
     name: string,
     email: string,
-    password: string,
+    hashedPassword: string,
     isActive = true,
   ): UserAggregate {
     const userId = new UserId(id);
     const userName = new UserName(name);
     const userEmail = new UserEmail(email);
-    const userPassword = new UserPassword(password);
+    const userPassword = UserPassword.fromHashed(hashedPassword); // Contraseña ya hasheada
     const userStatus = new UserStatus(isActive);
 
     return new UserAggregate(
