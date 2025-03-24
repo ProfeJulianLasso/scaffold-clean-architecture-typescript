@@ -14,12 +14,16 @@ DOMINIO ← APLICACIÓN ← INFRAESTRUCTURA
 
 En este modelo, la infraestructura solo conoce a la aplicación, y es la aplicación quien conoce al dominio. Para poder aplicar este modelo necesitaremos:
 
-- Interfaces de repositorio en la capa de aplicación.
+- Interfaces de repositorio en la capa de aplicación
 - DTOs definidos en la capa de aplicación para la comunicación entre aplicación e infraestructura
 - Servicios de traducción/mapeo en la capa de aplicación para convertir entre DTOs y objetos del dominio
-- Debe ser la capa de aplicación quien defina por medio de interfaces, cómo debe la capa de infraestructura debe implementar los esquemas de persistencia. De esta forma aplicación sabrá cómo se persisten los datos.
-- La capa de dominio y la capa de aplicación son totalmente puros en su implementación, es decir, no pueden depender de librerías o cualquier otro tercero.
-- La capa de aplicación debe implementar CQRS.
+- Debe ser la capa de aplicación quien defina por medio de interfaces, cómo debe la capa de infraestructura debe implementar los esquemas de persistencia. De esta forma aplicación sabrá cómo se persisten los datos
+- La capa de dominio y la capa de aplicación deben mantenerse lo más puras posible. Esto significa:
+  - No pueden depender directamente de librerías externas de infraestructura (base de datos, frameworks, etc.)
+  - Deben definir interfaces claras para todos los servicios que necesitan de la capa de infraestructura
+  - Cualquier dependencia externa necesaria debe ser abstraída mediante interfaces definidas en la capa de aplicación e implementadas en la capa de infraestructura
+  - Las interfaces de estas abstracciones deben ubicarse en la capa de aplicación, específicamente en el directorio "abstractions"
+- La capa de aplicación debe implementar CQRS
 
 Esto sería el flujo de datos
 
@@ -49,7 +53,7 @@ Este proyecto es una aplicación de ejemplo para el curso de TypeScript y NestJS
 - El código debe ser simple y legible, siguiendo el principio KISS (Keep It Simple, Stupid)
 - Evitar código redundante siguiendo el principio DRY (Don't Repeat Yourself)
 - No implementar funcionalidades que no se hayan solicitado explícitamente, adhiriéndose al principio YAGNI (You Ain't Gonna Need It)
-- Documentar el código sólo si se solicita de forma explicita de forma profesional y detallada, siguiendo las convenciones de estilo de TSDoc
+- Documentar el código solamente cuando se solicite explícitamente. En dicho caso, la documentación debe seguir rigurosamente las convenciones de estilo de TSDoc, con descripciones completas de parámetros, tipos de retorno y ejemplos cuando sea apropiado
 - Hacer pruebas unitarias bajo el patrón AAA (Arrange, Act, Assert) sólo si se solicita de forma explícita
 - Cuando se escriba una clase con sólo métodos estáticos, se debe dar preferencia a objetos literales
 - Siempre dar preferencia a Result Pattern y ResultException para manejar resultados de operaciones y errores
@@ -101,8 +105,8 @@ Este proyecto es una aplicación de ejemplo para el curso de TypeScript y NestJS
 - Usar `Set` para almacenar colecciones de valores únicos
 - Implementar Arrays tipados para colecciones homogéneas
 - Usar Tuples para arrays de longitud fija con tipos diferentes
-- Preferir bucles imperativos sobre métodos funcionales
-- Siempre preferir un if sin else sobre un if con else
+- Preferir bucles imperativos (for, while) sobre métodos funcionales (forEach, map) exclusivamente en casos donde el rendimiento sea crítico o se trabaje con grandes volúmenes de datos
+- Usar early returns con estructuras if independientes en lugar de construcciones if-else-if anidadas
 
 ### Funciones
 
@@ -111,25 +115,25 @@ Este proyecto es una aplicación de ejemplo para el curso de TypeScript y NestJS
 - Usar `async/await` en lugar de callbacks o promesas encadenadas
 - Aplicar la técnica de early return para reducir anidación
 - Implementar funciones puras cuando sea posible (sin efectos secundarios)
+- Favorecer enfoque funcional (map, filter, reduce) para transformaciones de datos
 
 ### Manejo de Errores
 
-- Dar prioridad al patrón `Result<T>` sobre el uso de bloques `try/catch`
-- Usar `try/catch` estrictamente cuando sea necesario (I/O, parseo, etc.)
-- Crear tipos personalizados de error extendiendo `ResultException`
+- Siempre devolver objetos `Result<T>` como respuesta de operaciones, independientemente del manejo interno de errores
+- Usar `try/catch` estrictamente cuando sea necesario (I/O, parseo, etc.), capturando las excepciones y transformándolas en objetos `Result<T>` con error
+- Crear tipos personalizados de error para casos específicos del dominio
 - Implementar logging adecuado en manejo de errores
 
 ### Organización de Código
 
 - Un componente/clase por archivo
 - Implementar los modificadores de acceso adecuados (private, protected), nunca usar public
-- Los atributos que mapean servicios inyectados deben ser readonly, no usar `_` comp prefijo y usar la forma estándar de inyección de dependencias de TypeScript
+- - Los atributos inyectados mediante constructor deben ser readonly y NO llevar el prefijo `_` (ejemplo: `constructor(private readonly userService: IUserService)`), mientras que los atributos privados declarados dentro de la clase SÍ deben llevar el prefijo `_` (ejemplo: `private _name: string;`)
 - Las inyecciones de dependencias deben usarse con `this.[dependencia]` al ser utilizadas en el mismo constructor
 
 ### Avanzado
 
 - Usar Mapped Types para transformaciones de tipos
-- No implementar Type Inference para reducir redundancia de tipos
 - Utilizar Conditional Types para lógica a nivel de tipos
 - Usar inyección de dependencias por constructor
 - Inyectar interfaces, no implementaciones concretas
@@ -153,6 +157,21 @@ Este proyecto es una aplicación de ejemplo para el curso de TypeScript y NestJS
 - Usar `jest.advanceTimersByTime` para avanzar el temporizador
 - Usar `jest.runAllTimers` para ejecutar todos los temporizadores pendientes
 - Usar `jest.setSystemTime` para configurar el tiempo de ejecución
+
+## Convenciones en la estructura de directorios
+
+- Los nombres de directorios deben ser en kebab-case
+- Los nombres de archivos deben ser en kebab-case (ejemplo: panel-control.repository.ts)
+- Dentro de los archivos, las clases, interfaces y tipos deben seguir PascalCase (ejemplo: PanelControlRepository)
+- En las plantillas de estructura, {name} debe interpretarse como el nombre en kebab-case para archivos y directorios, mientras que {Name} debe interpretarse como el mismo nombre en PascalCase para clases, interfaces y tipos
+
+### Ejemplo de nomenclatura
+
+Para un recurso llamado "usuario":
+
+- Directorio: usuario/
+- Archivo: usuario.repository.ts
+- Clase/Interfaz: IUsuarioRepository, UsuarioRepository
 
 ## Estructura de directorios
 
